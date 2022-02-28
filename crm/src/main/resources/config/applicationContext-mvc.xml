@@ -27,6 +27,9 @@
     <!-- dispatcherServlet截获所有URL请求,并将静态资源的访问转给DefaultServlet来处理，DispatcherServlet本省没有处理静态资源的能力 -->
     <mvc:default-servlet-handler />
 
+    <mvc:resources mapping="/image/**" location="/image/"/>
+    <mvc:resources mapping="/jquery/**" location="/jquery/"/>
+
 
     <!-- spring mvc 扫描包下的controller -->
     <context:component-scan base-package="com.yp.crm.web.controller"/>
