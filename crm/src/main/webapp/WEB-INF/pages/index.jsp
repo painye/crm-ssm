@@ -10,7 +10,7 @@ request.getServerPort() + request.getContextPath() + "/";
 </head>
 <body>
 	<script type="text/javascript">
-		window.location.href = "settings/qx/user/login.jsp";
+		window.location.href = "toLogin.do";
 	</script>
 </body>
 </html>

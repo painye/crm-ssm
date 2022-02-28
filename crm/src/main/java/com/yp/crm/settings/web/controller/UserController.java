@@ -5,6 +5,7 @@ package com.yp.crm.settings.web.controller;
  */
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @ClassName : com.yp.crm.settings.web.controller.UserController
@@ -15,8 +16,9 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class UserController {
 
+    @RequestMapping("/toLogin.do")
     public String toLogin(){
-        System.out.println("静茹登录页的转发");
+        System.out.println("进入登录页的转发");
         return "settings/qx/user/login";
     }
 }
