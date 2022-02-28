@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
 String basePath = request.getScheme() + "://" + request.getServerName() + ":" +
 request.getServerPort() + request.getContextPath() + "/";
@@ -13,6 +14,15 @@ request.getServerPort() + request.getContextPath() + "/";
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 	<script>
 		$(function () {
+			//回车绑定登录键，提交请求
+			$(window).keydown(function (event) {
+				if(event.keyCode == 13){
+					//回车键被·按下
+					$("#login").click();
+				}
+			})
+
+
 			//登录按钮绑定事件
 			$("#login").click(function () {
 				var loginAct = $.trim($("#loginAct").val());
@@ -25,7 +35,7 @@ request.getServerPort() + request.getContextPath() + "/";
 					data:{
 						"loginAct" : loginAct,
 						"loginPwd" : loginPwd,
-						"isRemPed" : isRemPwd
+						"isRemPwd" : isRemPwd
 					},
 					dataType :"json",
 					type:"post",
@@ -60,14 +70,20 @@ request.getServerPort() + request.getContextPath() + "/";
 			<form action="workbench/index.html" class="form-horizontal" role="form">
 				<div class="form-group form-group-lg">
 					<div style="width: 350px;">
-						<input class="form-control" id="loginAct" type="text" placeholder="用户名">
+						<input class="form-control" id="loginAct" type="text" value="${cookie.loginAct.value}" placeholder="用户名">
 					</div>
 					<div style="width: 350px; position: relative;top: 20px;">
-						<input class="form-control" id="loginPwd" type="password" placeholder="密码">
+						<input class="form-control" id="loginPwd" type="password"  value="${cookie.loginPwd.value}" placeholder="密码">
 					</div>
 					<div class="checkbox"  style="position: relative;top: 30px; left: 10px;">
 						<label>
-							<input type="checkbox" id="isRemPwd"> 十天内免登录
+							<c:if test="${not empty cookie.loginAct and not empty cookie.loginPwd }">
+								<input type="checkbox" id="isRemPwd" checked>
+							</c:if>
+							<c:if test="${ empty cookie.loginAct or  empty cookie.loginPwd }">
+								<input type="checkbox" id="isRemPwd" >
+							</c:if>
+							十天内免登录
 						</label>
 						&nbsp;&nbsp;
 						<span id="msg" style="color: red"></span>

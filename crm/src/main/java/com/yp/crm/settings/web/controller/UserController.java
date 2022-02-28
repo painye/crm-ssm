@@ -1,10 +1,12 @@
 package com.yp.crm.settings.web.controller;
 /**
  * @author pan
- * @date 2022/2/28 11:14
+ * @date com.yp.crm.common.Constant.Constants.RETURN_OBJECT_CODE_FAIl22/2/28 11:14
  */
 
+import com.yp.crm.common.Constant.Constants;
 import com.yp.crm.common.domain.ReturnObject;
+import com.yp.crm.common.utils.DateUtils;
 import com.yp.crm.settings.domain.User;
 import com.yp.crm.settings.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +14,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +26,7 @@ import java.util.Map;
  * @ClassName : com.yp.crm.settings.web.controller.UserController
  * @Description : 用来转发setting中user文件下的转发
  * @author pan
- * @date 2022/2/28 11:14
+ * @date com.yp.crm.common.Constant.Constants.RETURN_OBJECT_CODE_FAIl22/2/28 11:14
  */
 @Controller
 @RequestMapping("/settings/qx/user")
@@ -40,35 +44,54 @@ public class UserController {
 
     @RequestMapping("/login.do")
     @ResponseBody
-    public Object login(String loginAct, String loginPwd, String isRemPwd, HttpServletRequest httpServletRequest){
+    public Object login(String loginAct, String loginPwd, String isRemPwd, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, HttpSession session){
         Map<String , Object> map =new HashMap<>();
         map.put("loginAct", loginAct);
         map.put("loginPwd", loginPwd);
         User user = userService.queryUserByLoginActAndLoginPwd(map);
-        SimpleDateFormat sdf = new SimpleDateFormat("YY-MM-DD HH:mm:ss");
         Date nowTime = new Date();
-        String nowStr = sdf.format(nowTime);
-        System.out.println(nowStr);
+        final String nowStr = DateUtils.formateDateTime(nowTime);
         ReturnObject retObject = new ReturnObject();
         if(user == null){
-            retObject.setCode("0");
+            retObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
             retObject.setMessage("账户密码错误");
-        }else if(nowStr.compareTo(user.getExpiretime())<0){
+        }else if(nowStr.compareTo(user.getExpiretime()) < 0){
             //登陆失败，该账号已过期
             retObject.setMessage("该账号已过期");
-            retObject.setCode("0");
-        }else if("0".equals(user.getLockstate())){
+            retObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+        }else if(Constants.RETURN_OBJECT_CODE_FAIl.equals(user.getLockstate())){
             //登陆失败，账号已被锁定
-            retObject.setCode("0");
+            retObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
             retObject.setMessage("账号已被锁定");
         }else if(!user.getAllowips().contains(httpServletRequest.getRemoteAddr())){
             //登陆失败，Ip不被允许
-            retObject.setCode("0");
+            retObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
             retObject.setMessage("Ip不被允许");
         }else{
-            retObject.setCode("1");
+            //登陆成功
+            retObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+            session.setAttribute(Constants.SESSION_USER, user);
+
+            if("true".equals(isRemPwd)){
+                //用户勾选了十天内记住密码，我们需要向response中加入cookie
+
+                Cookie c1 = new Cookie("loginAct", loginAct);
+                c1.setMaxAge(10*24*60*60);
+                httpServletResponse.addCookie(c1);
+                Cookie c2 = new Cookie("loginPwd", loginPwd);
+                c2.setMaxAge(10*24*60*60);
+                httpServletResponse.addCookie(c2);
+
+            }else {
+                //删除没有过期的cookie
+                Cookie c1 = new Cookie("loginAct", "1");
+                c1.setMaxAge(0);
+                httpServletResponse.addCookie(c1);
+                Cookie c2 = new Cookie("loginPwd", "1");
+                c2.setMaxAge(0);
+                httpServletResponse.addCookie(c2);
+            }
         }
-        System.out.println(user+" "+retObject);
         return retObject;
     }
 }
