@@ -26,7 +26,7 @@
 
     <!-- dispatcherServlet截获所有URL请求,并将静态资源的访问转给DefaultServlet来处理，DispatcherServlet本省没有处理静态资源的能力 -->
     <mvc:default-servlet-handler />
-
+    
     <mvc:resources mapping="/image/**" location="/image/"/>
     <mvc:resources mapping="/jquery/**" location="/jquery/"/>
 
