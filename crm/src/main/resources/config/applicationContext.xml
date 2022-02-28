@@ -6,7 +6,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <!--声明组件扫描器-->
-    <context:component-scan base-package="com.yp.crm.service"/>
+    <context:component-scan base-package="com.yp.crm.settings.service"/>
 
     <!--引入数据库的配置文件-->
     <context:property-placeholder location="classpath:config/jdbc.properties"/>
@@ -28,7 +28,7 @@
     <!--利用动态地阿里创建Mapper-->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
-        <property name="basePackage" value="com.yp.crm.mapper"/>
+        <property name="basePackage" value="com.yp.crm.settings.mapper"/>
     </bean>
 
     <!--配置事务管理器-->
@@ -39,7 +39,7 @@
     <!--配置事务-->
     <aop:config>
         <!--配置切入点表达式,service包下的类中的所有方法-->
-        <aop:pointcut  id="allMethodPointcut" expression="execution(* com.yp.crm.service.*.*(..))"/>
+        <aop:pointcut  id="allMethodPointcut" expression="execution(* com.yp.crm.settings.service.*.*(..))"/>
        <aop:advisor advice-ref="txAdvice" pointcut-ref="allMethodPointcut"/>
     </aop:config>
 

@@ -11,6 +11,38 @@ request.getServerPort() + request.getContextPath() + "/";
 <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+	<script>
+		$(function () {
+			//登录按钮绑定事件
+			$("#login").click(function () {
+				var loginAct = $.trim($("#loginAct").val());
+				var loginPwd = $.trim($("#loginPwd").val());
+				var isRemPwd = $("#isRemPwd").prop("checked");
+
+				//表单验证
+				$.ajax({
+					url:"settings/qx/user/login.do",
+					data:{
+						"loginAct" : loginAct,
+						"loginPwd" : loginPwd,
+						"isRemPed" : isRemPwd
+					},
+					dataType :"json",
+					type:"post",
+					success : function (data) {
+						if(data.code == "0"){
+							// 账号登陆失败
+							$("#msg").html(data.message);
+						}else{
+							window.location.href="workbench/index.do";
+						}
+
+					}
+
+				})
+			})
+		})
+	</script>
 </head>
 <body>
 	<div style="position: absolute; top: 0px; left: 0px; width: 60%;">
@@ -28,19 +60,19 @@ request.getServerPort() + request.getContextPath() + "/";
 			<form action="workbench/index.html" class="form-horizontal" role="form">
 				<div class="form-group form-group-lg">
 					<div style="width: 350px;">
-						<input class="form-control" type="text" placeholder="用户名">
+						<input class="form-control" id="loginAct" type="text" placeholder="用户名">
 					</div>
 					<div style="width: 350px; position: relative;top: 20px;">
-						<input class="form-control" type="password" placeholder="密码">
+						<input class="form-control" id="loginPwd" type="password" placeholder="密码">
 					</div>
 					<div class="checkbox"  style="position: relative;top: 30px; left: 10px;">
 						<label>
-							<input type="checkbox"> 十天内免登录
+							<input type="checkbox" id="isRemPwd"> 十天内免登录
 						</label>
 						&nbsp;&nbsp;
-						<span id="msg"></span>
+						<span id="msg" style="color: red"></span>
 					</div>
-					<button type="submit" class="btn btn-primary btn-lg btn-block"  style="width: 350px; position: relative;top: 45px;">登录</button>
+					<button type="button" id="login" class="btn btn-primary btn-lg btn-block"  style="width: 350px; position: relative;top: 45px;">登录</button>
 				</div>
 			</form>
 		</div>
