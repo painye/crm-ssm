@@ -30,6 +30,9 @@
 
     <!-- spring mvc 扫描包下的controller -->
     <context:component-scan base-package="com.yp.crm.web.controller"/>
+    <context:component-scan base-package="com.yp.crm.settings.web.controller"/>
+
+
     <!-- 配置注解驱动，其主要用来解决事务，以及与dispatcherServlet的冲突问题 -->
     <mvc:annotation-driven/>
     <!-- 配置视图解析器 -->
