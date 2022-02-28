@@ -94,4 +94,21 @@ public class UserController {
         }
         return retObject;
     }
+
+
+    @RequestMapping("logout.do")
+    public String logout(HttpServletResponse response, HttpSession session){
+        //1、清除cookie
+        Cookie c1 = new Cookie("loginAct", "1");
+        c1.setMaxAge(0);
+        response.addCookie(c1);
+        Cookie c2 = new Cookie("loginPwd", "1");
+        c2.setMaxAge(0);
+        response.addCookie(c2);
+        //2、销毁session
+        session.invalidate();
+        //3、转发到首页,利用重定向
+        return "redirect:/";
+
+    }
 }
