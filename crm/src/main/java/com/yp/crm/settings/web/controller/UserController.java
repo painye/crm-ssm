@@ -45,6 +45,7 @@ public class UserController {
     @RequestMapping("/login.do")
     @ResponseBody
     public Object login(String loginAct, String loginPwd, String isRemPwd, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, HttpSession session){
+        System.out.println("进行登录");
         Map<String , Object> map =new HashMap<>();
         map.put("loginAct", loginAct);
         map.put("loginPwd", loginPwd);
