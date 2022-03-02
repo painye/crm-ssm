@@ -19,11 +19,131 @@ request.getServerPort() + request.getContextPath() + "/";
 <script type="text/javascript">
 
 	$(function(){
-		
-		
-		
+
+		//绑定创建活动的按钮
+		$("#createActivityBtn").click(function () {
+			//重置表单
+			$("#createActivityForm").get(0).reset();
+			//显示模态窗口
+			$("#createActivityModal").modal("show");
+		})
+
+		//绑定保存按钮的事件
+		$("#saveCreateActivityBtn").click(function () {
+			var owner = $("#create-marketActivityOwner").val();
+			var name = $.trim($("#create-marketActivityName").val());
+			var startDate = $("#create-startDate").val();
+			var endDate = $("#create-endDate").val();
+			var cost = $.trim($("#create-cost").val());
+			var description = $.trim($("#create-description").val());
+			//表单验证
+			if(owner == ""){
+				alert("所有者不能为空");
+				return;
+			}
+			if(name == ""){
+				alert("活动名称不能为空");
+				return;
+			}
+			if(startDate !=""&&endDate!=""){
+				if(startDate>endDate){
+					alert("结束日期不能比开始日期小");
+					return;
+				}
+			}
+			//正则表达式,非负整数
+			var regExp=/^(([1-9]\d*)|0)$/;
+			if(!regExp.test(cost)){
+				alert("成本只能是非负整数")
+			}
+
+			//非负请求
+			$.ajax({
+				url : "workbench/activity/createActivity.do",
+				data:{
+					"owner": owner,
+					"name": name,
+					"startdate": startDate,
+					"enddate" :endDate,
+					"cost" :cost,
+					"description" :description
+				},
+				dataType : "json",
+				type : "post",
+				success : function (data) {
+					if(data.code == 1){
+						//保存成功
+
+						//关闭模态窗口
+						$("#createActivityModal").modal("hide");
+					}else{
+						alert("保存失败");
+					}
+
+				}
+			});
+		})
+
+		//当容器创建完成之后，对容器调用日历函数
+		$(".myDate").datetimepicker({
+			language : "zh-CN",
+			format : "yyyy-mm-dd",
+			minView: 'month',
+			initialDate : new Date(),	//初始化显示的日期
+			autoclose : true ,//选择完日期之后是否默认关闭
+			todayBtn: true,
+			clearBtn : true
+		});
+
+		queryActivityByConditionForPage();
+
+		//为查询按钮绑定事件
+        $("#queryActivityByConditionBtn").click(function () {
+			queryActivityByConditionForPage();
+		});
+
 	});
-	
+
+
+
+
+	function queryActivityByConditionForPage() {
+		var name = $.trim($("#query-name").val());
+		var owner = $.trim($("#query-owner").val());
+		var startDate = $.trim($("#query-startDate").val());
+		var endDate = $.trim($("#query-endDate").val());
+
+		var pageNo = 1;
+		var pageSize = 10;
+		$.ajax({
+			url : "workbench/activity/queryActivityByConditionForPage.do",
+			data:{
+				name:name,
+				owner:owner,
+				startDate:startDate,
+				endDate:endDate,
+				pageNo:pageNo,
+				pageSize:pageSize
+			},
+			dataType: "json",
+			type:"post",
+			success : function (data) {
+				$("#totalRowsB").text(data.totalRows);
+				var html="";
+				$.each(data.activityList, function (index, object) {
+					html+='  <tr class="active">';
+					html+='  		<td><input type="checkbox" value="'+object.id+'"/></td>';
+					html+='  		<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'detail.html\';">'+object.name+'</a></td>';
+					html+='  <td>'+object.owner+'</td>';
+					html+='  <td>'+object.startdate+'</td>';
+					html+='  <td>'+object.enddate+'</td>';
+					html+='  </tr>';
+				})
+				$("#tbody").html(html);
+			}
+		});
+	}
+
 </script>
 </head>
 <body>
@@ -40,7 +160,7 @@ request.getServerPort() + request.getContextPath() + "/";
 				</div>
 				<div class="modal-body">
 				
-					<form class="form-horizontal" role="form">
+					<form class="form-horizontal" id="createActivityForm" role="form">
 					
 						<div class="form-group">
 							<label for="create-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
@@ -58,13 +178,13 @@ request.getServerPort() + request.getContextPath() + "/";
 						</div>
 						
 						<div class="form-group">
-							<label for="create-startTime" class="col-sm-2 control-label">开始日期</label>
+							<label for="create-startDate" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-startTime">
+								<input type="text" class="form-control myDate" id="create-startDate">
 							</div>
-							<label for="create-endTime" class="col-sm-2 control-label">结束日期</label>
+							<label for="create-endDate" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-endTime">
+								<input type="text" class="form-control myDate" id="create-endDate">
 							</div>
 						</div>
                         <div class="form-group">
@@ -75,9 +195,9 @@ request.getServerPort() + request.getContextPath() + "/";
                             </div>
                         </div>
 						<div class="form-group">
-							<label for="create-describe" class="col-sm-2 control-label">描述</label>
+							<label for="create-description" class="col-sm-2 control-label">描述</label>
 							<div class="col-sm-10" style="width: 81%;">
-								<textarea class="form-control" rows="3" id="create-describe"></textarea>
+								<textarea class="form-control" rows="3" id="create-description"></textarea>
 							</div>
 						</div>
 						
@@ -86,7 +206,7 @@ request.getServerPort() + request.getContextPath() + "/";
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">保存</button>
+					<button type="button" class="btn btn-primary" id="saveCreateActivityBtn">保存</button>
 				</div>
 			</div>
 		</div>
@@ -212,14 +332,14 @@ request.getServerPort() + request.getContextPath() + "/";
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">名称</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="query-name">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">所有者</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="query-owner">
 				    </div>
 				  </div>
 
@@ -227,23 +347,23 @@ request.getServerPort() + request.getContextPath() + "/";
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">开始日期</div>
-					  <input class="form-control" type="text" id="startTime" />
+					  <input class="form-control" type="text" id="query-startDate" />
 				    </div>
 				  </div>
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">结束日期</div>
-					  <input class="form-control" type="text" id="endTime">
+					  <input class="form-control" type="text" id="query-endDate">
 				    </div>
 				  </div>
 				  
-				  <button type="submit" class="btn btn-default">查询</button>
+				  <button type="button" class="btn btn-default" id="queryActivityByConditionBtn">查询</button>
 				  
 				</form>
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 5px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
-				  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createActivityModal"><span class="glyphicon glyphicon-plus"></span> 创建</button>
+				  <button type="button" class="btn btn-primary" id="createActivityBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
 				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
@@ -264,28 +384,29 @@ request.getServerPort() + request.getContextPath() + "/";
 							<td>结束日期</td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr class="active">
-							<td><input type="checkbox" /></td>
-							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">发传单</a></td>
-                            <td>zhangsan</td>
-							<td>2020-10-10</td>
-							<td>2020-10-20</td>
-						</tr>
-                        <tr class="active">
-                            <td><input type="checkbox" /></td>
-                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">发传单</a></td>
-                            <td>zhangsan</td>
-                            <td>2020-10-10</td>
-                            <td>2020-10-20</td>
-                        </tr>
+					<tbody id="tbody">
+<%--						<tr class="active">--%>
+<%--							<td><input type="checkbox" /></td>--%>
+<%--							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">发传单</a></td>--%>
+<%--                            <td>zhangsan</td>--%>
+<%--							<td>2020-10-10</td>--%>
+<%--							<td>2020-10-20</td>--%>
+<%--						</tr>--%>
+<%--                        <tr class="active">--%>
+<%--                            <td><input type="checkbox" /></td>--%>
+<%--                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">发传单</a></td>--%>
+<%--                            <td>zhangsan</td>--%>
+<%--                            <td>2020-10-10</td>--%>
+<%--                            <td>2020-10-20</td>--%>
+<%--                        </tr>--%>
+
 					</tbody>
 				</table>
 			</div>
 			
 			<div style="height: 50px; position: relative;top: 30px;">
 				<div>
-					<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
+					<button type="button" class="btn btn-default" style="cursor: default;">共<b id="totalRowsB"></b>条记录</button>
 				</div>
 				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
 					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
