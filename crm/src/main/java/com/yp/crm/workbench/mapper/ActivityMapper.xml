@@ -250,12 +250,12 @@
     </where>
   </select>
 
-  <select id="deleteCheckedActivity" resultType="int">
+  <delete id="deleteCheckedActivity" >
     delete from tbl_activity
     where id in
-    <foreach collection="ids" open="(" item="id" separator="," close=")">
+    <foreach collection="array" open="(" item="id" separator="," close=")">
       #{id}
     </foreach>
-  </select>
+  </delete>
 </mapper>
 

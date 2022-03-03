@@ -100,4 +100,27 @@ public class ActivityController {
         retMap.put("totalRows",totalRows );
         return retMap;
     }
+
+    @RequestMapping("deleteCheckedActivity.do")
+    @ResponseBody
+    public Object deleteCheckedActivity(String[] ids){
+        for(String id : ids){
+            System.out.println(id);
+        }
+        ReturnObject returnObject = new ReturnObject();
+        try {
+            int nums = activityService.deleteCheckedActivity(ids);
+            if(nums> 0) {
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+            }else{
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+                returnObject.setMessage("系统正忙，请稍后重试");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+            returnObject.setMessage("系统正忙，请稍后重试");
+        }
+        return returnObject;
+    }
 }
