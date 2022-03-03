@@ -106,10 +106,18 @@
 
         //为全选事件绑定
 		$("#checkAll").click(function () {
-			
+			$("#tbody input[type = 'checkbox']").prop('checked', this.checked);
 		})
 
 
+		//添加全部勾选事件触发全选按钮
+		$("#tbody").on("click", "input[type='checkbox']", function(){
+			if($("#tbody input[type='checkbox']").size()==$("#tbody input[type='checkbox']:checked").size()){
+				$("#checkAll").prop("checked", true);
+			}else{
+				$("#checkAll").prop("checked", false);
+			}
+		})
 	});
 
 
@@ -155,6 +163,9 @@
 				{
 					totalPages=parseInt(data.totalRows/pageSize)+1;
 				}
+
+				//取消全选按钮
+				$("#checkAll").prop("checked", false);
 
 				//调用分页插件
 				$("#demo_pag1").bs_pagination({
