@@ -135,7 +135,7 @@ public class ActivityController {
     public Object editActivity(Activity activity, HttpSession session){
         ReturnObject retObject = new ReturnObject();
         User user= (User) session.getAttribute(Constants.SESSION_USER);
-        activity.setEditby(user.getName());
+        activity.setEditby(user.getId());
         activity.setEdittime(DateUtils.formateDateTime(new Date()));
         try{
             int nums = activityService.editActivityByCondition(activity);
