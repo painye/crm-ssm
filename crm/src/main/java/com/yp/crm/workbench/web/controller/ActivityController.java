@@ -12,13 +12,20 @@ import com.yp.crm.settings.domain.User;
 import com.yp.crm.settings.service.UserService;
 import com.yp.crm.workbench.domain.Activity;
 import com.yp.crm.workbench.service.ActivityService;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +48,7 @@ public class ActivityController {
     @Autowired
     private ActivityService activityService;
 
-    @RequestMapping("index.do")
+    @RequestMapping("/index.do")
     public ModelAndView index(){
         ModelAndView mv = new ModelAndView();
         List<User> userList = userService.queryAllUser();
@@ -52,7 +59,7 @@ public class ActivityController {
 
 
     @ResponseBody
-    @RequestMapping("createActivity.do")
+    @RequestMapping("/createActivity.do")
     public ReturnObject createActivity(Activity activity, HttpSession session){
         //封装参数
         activity.setId(UUIDUtils.getUUid());
@@ -101,7 +108,7 @@ public class ActivityController {
         return retMap;
     }
 
-    @RequestMapping("deleteCheckedActivity.do")
+    @RequestMapping("/deleteCheckedActivity.do")
     @ResponseBody
     public Object deleteCheckedActivity(String[] ids){
         for(String id : ids){
@@ -130,7 +137,7 @@ public class ActivityController {
         return activityService.queryActivityById(id);
     }
 
-    @RequestMapping("editActivity.do")
+    @RequestMapping("/editActivity.do")
     @ResponseBody
     public Object editActivity(Activity activity, HttpSession session){
         ReturnObject retObject = new ReturnObject();
@@ -157,4 +164,98 @@ public class ActivityController {
     public String detail(){
         return "workbench/activity/detail";
     }
+
+    @RequestMapping("/download.do")
+    public void download(HttpServletResponse response) throws IOException {
+        //1、设置response的响应格式
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        //2、获取响应的字节输出流
+        OutputStream outputStream = response.getOutputStream();
+
+        //设置响应头信息，当浏览器接受到后台发送过来的文件的时候不是直接打开该文件而是
+        //以附件的形式直接下载
+        response.addHeader("Content-Disposition", "attachment;filename=studentList.xls");
+
+        //3、创建读取excel文件的字节输入流
+        InputStream inputStream = new FileInputStream("C:\\Users\\dell\\Desktop\\user.xls");
+        //4、将读入的字节写入到响应的字节输出流中去
+        byte[] buff=new byte[256];
+        int len = 0;
+        while((len = inputStream.read(buff))!=-1){
+            outputStream.write(buff,0, len);
+        }
+
+        //关闭各种流
+        inputStream.close();
+        outputStream.flush();
+    }
+
+    @RequestMapping("/exportAllActivity.do")
+    public void exportAllActivity(HttpServletResponse response) throws IOException {
+        System.out.println("--------------------------------------------------------");
+        List<Activity> activityList = activityService.queryAllActivity();
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet("ActivityList");
+        HSSFRow row = sheet.createRow(0);
+        //准备设置表头
+        HSSFCell cell = row.createCell(0);
+        cell.setCellValue("ID");
+        cell = row.createCell(1);
+        cell.setCellValue("所有者");
+        cell = row.createCell(2);
+        cell.setCellValue("活动名称");
+        cell = row.createCell(3);
+        cell.setCellValue("开始日期");
+        cell = row.createCell(4);
+        cell.setCellValue("结束日期");
+        cell = row.createCell(5);
+        cell.setCellValue("成本");
+        cell = row.createCell(6);
+        cell.setCellValue("描述");
+        cell = row.createCell(7);
+        cell.setCellValue("创建时间");
+        cell = row.createCell(8);
+        cell.setCellValue("创建者");
+        cell = row.createCell(9);
+        cell.setCellValue("修改时间");
+        cell = row.createCell(10);
+        cell.setCellValue("修改者");
+
+        //存入所有市场活动的内容
+        int i =1;
+        for(Activity activity: activityList){
+            row = sheet.createRow(i);
+            cell = row.createCell(0);
+            cell.setCellValue(activity.getId());
+            cell = row.createCell(1);
+            cell.setCellValue(activity.getOwner());
+            cell = row.createCell(2);
+            cell.setCellValue(activity.getName());
+            cell = row.createCell(3);
+            cell.setCellValue(activity.getStartdate());
+            cell = row.createCell(4);
+            cell.setCellValue(activity.getEnddate());
+            cell = row.createCell(5);
+            cell.setCellValue(activity.getCost());
+            cell = row.createCell(6);
+            cell.setCellValue(activity.getDescription());
+            cell = row.createCell(7);
+            cell.setCellValue(activity.getCreatetime());
+            cell = row.createCell(8);
+            cell.setCellValue(activity.getCreateby());
+            cell = row.createCell(9);
+            cell.setCellValue(activity.getEdittime());
+            cell = row.createCell(10);
+            cell.setCellValue(activity.getEditby());
+            i++;
+        }
+
+        OutputStream os = new FileOutputStream("C:\\Users\\dell\\Desktop\\activityList.xls");
+        wb.write(os);
+
+        os.flush();
+        wb.close();
+        return ;
+    }
+
 }
