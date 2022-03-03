@@ -263,6 +263,17 @@
     from tbl_activity where id = #{id}
   </select>
 
+  <select id="selectAllActivity" resultMap="BaseResultMap">
+    select a.id, u1.name as owner, a.name, a.startdate, a.enddate,
+            a.cost, a.description, a.createtime,u2.name as createyy,
+            a.edittime, u3.name as editby
+    from tbl_activity a
+    join tbl_user u1 on a.owner = u1.id
+    join tbl_user u2 on a.createby = u2.id
+    left join tbl_user u3 on a.editby = u3.id
+    order by createtime desc
+  </select>
+
 
 </mapper>
 

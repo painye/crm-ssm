@@ -61,4 +61,6 @@ public interface ActivityMapper {
     int deleteCheckedActivity(String[] ids);
 
     Activity selectActivityById(String id);
+
+    List<Activity> selectAllActivity();
 }

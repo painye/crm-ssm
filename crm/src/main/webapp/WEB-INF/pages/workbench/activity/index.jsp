@@ -211,14 +211,20 @@
 					if(data.code=='1'){
 						//修改成功
 						$("#editActivityModal").modal("hide");
-						queryActivityByConditionForPage(1, $("#demo_pag1").bs_pagination("getOption", "rowsPerPage"));
+						queryActivityByConditionForPage($("#demo_pag1").bs_pagination('getOption', 'currentPage'), $("#demo_pag1").bs_pagination("getOption", "rowsPerPage"));
 					}else{
 						alert(data.message);
 					}
 
 				}
 			})
-		})
+		});
+
+		//绑定批量全部导出按钮的事件
+		$("#exportActivityAllBtn").click(function () {
+			window.location.href="workbench/activity/exportAllActivity.do";
+
+		});
 
 	});
 
@@ -249,7 +255,7 @@
 				$.each(data.activityList, function(index, object) {
 					html+='  <tr class="active">';
 					html+='  		<td><input type="checkbox" value="'+object.id+'"/></td>';
-					html+='  		<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'detail.html\';">'+object.name+'</a></td>';
+					html+='  		<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.jsp\';">'+object.name+'</a></td>';
 					html+='  <td>'+object.owner+'</td>';
 					html+='  <td>'+object.startdate+'</td>';
 					html+='  <td>'+object.enddate+'</td>';
@@ -514,7 +520,7 @@
 				</div>
 				<div class="btn-group" style="position: relative; top: 18%;">
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#importActivityModal" ><span class="glyphicon glyphicon-import"></span> 上传列表数据（导入）</button>
-                    <button id="exportActivityAllBtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"></span> 下载列表数据（批量导出）</button>
+                    <button id="exportActivityAllBtn" type="button" class="btn btn-default" ><span class="glyphicon glyphicon-export"></span> 下载列表数据（批量导出）</button>
                     <button id="exportActivityXzBtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"></span> 下载列表数据（选择导出）</button>
                 </div>
 			</div>
@@ -532,14 +538,14 @@
 					<tbody id="tbody">
 <%--						<tr class="active">--%>
 <%--							<td><input type="checkbox" /></td>--%>
-<%--							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">发传单</a></td>--%>
+<%--							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">发传单</a></td>--%>
 <%--                            <td>zhangsan</td>--%>
 <%--							<td>2020-10-10</td>--%>
 <%--							<td>2020-10-20</td>--%>
 <%--						</tr>--%>
 <%--                        <tr class="active">--%>
 <%--                            <td><input type="checkbox" /></td>--%>
-<%--                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">发传单</a></td>--%>
+<%--                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">发传单</a></td>--%>
 <%--                            <td>zhangsan</td>--%>
 <%--                            <td>2020-10-10</td>--%>
 <%--                            <td>2020-10-20</td>--%>

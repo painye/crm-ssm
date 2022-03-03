@@ -255,7 +255,24 @@ public class ActivityController {
 
         os.flush();
         wb.close();
-        return ;
+
+
+        //将文件发到浏览器上
+        //设置response的响应格式
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        //获取字节数出流
+        OutputStream out = response.getOutputStream();
+        //设置响应头信息，当浏览器接受到后台发送过来的文件的时候不是直接打开该文件而是
+        //以附件的形式直接下载
+        response.addHeader("Content-Disposition", "attachment;filename=MyActivityList.xls");
+        InputStream is = new FileInputStream("C:\\Users\\dell\\Desktop\\activityList.xls");
+        byte[] buff = new byte[256];
+        int len = 0;
+        while((len = is.read(buff))!=-1){
+            out.write(buff, 0 ,len);
+        }
+        is.close();
+        out.flush();
     }
 
 }

@@ -21,4 +21,6 @@ public interface ActivityService {
     Activity queryActivityById(String id);
 
     int editActivityByCondition(Activity activity);
+
+    List<Activity> queryAllActivity();
 }

@@ -57,5 +57,8 @@ public class ActivityServiceImpl implements ActivityService {
         return activityMapper.updateActivityByCondition(activity);
     }
 
-
+    @Override
+    public List<Activity> queryAllActivity() {
+        return activityMapper.selectAllActivity();
+    }
 }
