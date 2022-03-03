@@ -57,4 +57,6 @@ public interface ActivityMapper {
     List<Activity> selectActivityByConditionForPage(Map<String, Object> map);
 
     int selectActivityByConditionCounts(Map<String, Object> map);
+
+    int deleteCheckedActivity(String[] ids);
 }

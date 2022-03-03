@@ -42,5 +42,10 @@ public class ActivityServiceImpl implements ActivityService {
         return activityMapper.selectActivityByConditionCounts(map);
     }
 
+    @Override
+    public int deleteCheckedActivity(String[] ids) {
+        return activityMapper.deleteCheckedActivity(ids);
+    }
+
 
 }
