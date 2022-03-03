@@ -17,4 +17,8 @@ public interface ActivityService {
     int queryActivityByConditionCounts(Map<String, Object> map);
 
     int deleteCheckedActivity(String[] ids);
+
+    Activity queryActivityById(String id);
+
+    int editActivityByCondition(Activity activity);
 }

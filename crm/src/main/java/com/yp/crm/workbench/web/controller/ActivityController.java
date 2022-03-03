@@ -123,4 +123,38 @@ public class ActivityController {
         }
         return returnObject;
     }
+
+    @RequestMapping("/queryActivityById.do")
+    @ResponseBody
+    public Object queryActivityById(String id){
+        return activityService.queryActivityById(id);
+    }
+
+    @RequestMapping("editActivity.do")
+    @ResponseBody
+    public Object editActivity(Activity activity, HttpSession session){
+        ReturnObject retObject = new ReturnObject();
+        User user= (User) session.getAttribute(Constants.SESSION_USER);
+        activity.setEditby(user.getName());
+        activity.setEdittime(DateUtils.formateDateTime(new Date()));
+        try{
+            int nums = activityService.editActivityByCondition(activity);
+            if(nums == 1){
+                retObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+            }else{
+                retObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+                retObject.setMessage("系统正忙， 请稍后再试");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            retObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+            retObject.setMessage("系统正忙， 请稍后再试");
+        }
+        return retObject;
+    }
+
+    @RequestMapping("/detail.do")
+    public String detail(){
+        return "workbench/activity/detail";
+    }
 }

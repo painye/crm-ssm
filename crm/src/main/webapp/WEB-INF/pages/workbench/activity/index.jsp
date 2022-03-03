@@ -151,6 +151,75 @@
 				})
 			}
 		});
+
+		//为修改市场活动绑定事件
+		$("#editActivity").click(function () {
+			var checkIds = $("#tbody input[type='checkbox']:checked")
+			if(checkIds.size()==0){
+				alert("请选择您要修改的市场活动");
+			}else if(checkIds.size()>1) {
+				alert("只能选择一个市场活动进行修改");
+			}
+			//打开修改的模态窗口
+			$("#editActivityModal").modal("show");
+			var id=checkIds.val();
+			$.ajax({
+				url:"workbench/activity/queryActivityById.do",
+				data:{
+					id:id
+				},
+				dataType:"json",
+				type:"post",
+				success:function (data) {
+					$("#hideEditId").val(data.id);
+					$("#edit-marketActivityName").val(data.name);
+					//会自动与下拉框中所出现的userList进行匹配，显示其姓名
+					$("#edit-marketActivityOwner").val(data.owner);
+					$("#edit-startdate").val(data.startdate);
+					$("#edit-enddate").val(data.enddate);
+					$("#edit-cost").val(data.cost);
+					$("#edit-description").val(data.description);
+				}
+			})
+		});
+
+		//为修改市场活动的模态窗口的更新按钮绑定事件
+		$("#editActivityBtn").click(function () {
+			//先获取需要传递的参数
+			var id=$("#hideEditId").val();
+			var name=$.trim($("#edit-marketActivityName").val());
+			var owner=$.trim($("#edit-marketActivityOwner").val());
+			var startdate = $.trim($("#edit-startdate").val());
+			var enddate=$.trim($("#edit-enddate").val());
+			var cost=$.trim($("#edit-cost").val());
+			var description=$.trim($("#edit-description").val());
+
+			$.ajax({
+				url:"workbench/activity/editActivity.do",
+				data:{
+					id: id ,
+					name: name ,
+					owner: owner ,
+					startdate: startdate ,
+					enddate: enddate ,
+					cost: cost ,
+					description: description
+				},
+				dataType:"json",
+				type:"post",
+				success : function (data) {
+					if(data.code=='1'){
+						//修改成功
+						$("#editActivityModal").modal("hide");
+						queryActivityByConditionForPage(1, $("#demo_pag1").bs_pagination("getOption", "rowsPerPage"));
+					}else{
+						alert(data.message);
+					}
+
+				}
+			})
+		})
+
 	});
 
 
@@ -304,10 +373,11 @@
 						<div class="form-group">
 							<label for="edit-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
+								<input type="hidden" id="hideEditId">
 								<select class="form-control" id="edit-marketActivityOwner">
-								  <option>zhangsan</option>
-								  <option>lisi</option>
-								  <option>wangwu</option>
+								 <c:forEach items="${userList}" var="u">
+									 <option value="${u.id}">${u.name}</option>
+								 </c:forEach>
 								</select>
 							</div>
                             <label for="edit-marketActivityName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
@@ -317,13 +387,13 @@
 						</div>
 
 						<div class="form-group">
-							<label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
+							<label for="edit-startdate" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control myDate" id="edit-startTime" value="2020-10-10">
+								<input type="text" class="form-control myDate" id="edit-startdate" value="2020-10-10">
 							</div>
-							<label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
+							<label for="edit-enddate" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control myDate" id="edit-endTime" value="2020-10-20">
+								<input type="text" class="form-control myDate" id="edit-enddate" value="2020-10-20">
 							</div>
 						</div>
 						
@@ -335,9 +405,9 @@
 						</div>
 						
 						<div class="form-group">
-							<label for="edit-describe" class="col-sm-2 control-label">描述</label>
+							<label for="edit-description" class="col-sm-2 control-label">描述</label>
 							<div class="col-sm-10" style="width: 81%;">
-								<textarea class="form-control" rows="3" id="edit-describe">市场活动Marketing，是指品牌主办或参与的展览会议与公关市场活动，包括自行主办的各类研讨会、客户交流会、演示会、新产品发布会、体验会、答谢会、年会和出席参加并布展或演讲的展览会、研讨会、行业交流会、颁奖典礼等</textarea>
+								<textarea class="form-control" rows="3" id="edit-description">市场活动Marketing，是指品牌主办或参与的展览会议与公关市场活动，包括自行主办的各类研讨会、客户交流会、演示会、新产品发布会、体验会、答谢会、年会和出席参加并布展或演讲的展览会、研讨会、行业交流会、颁奖典礼等</textarea>
 							</div>
 						</div>
 						
@@ -346,7 +416,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+					<button type="button" class="btn btn-primary" id="editActivityBtn">更新</button>
 				</div>
 			</div>
 		</div>
@@ -439,7 +509,7 @@
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 5px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
 				  <button type="button" class="btn btn-primary" id="createActivityBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
+				  <button type="button" class="btn btn-default" id="editActivity"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
 				  <button type="button" class="btn btn-danger" id="deleteActivity"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				<div class="btn-group" style="position: relative; top: 18%;">
