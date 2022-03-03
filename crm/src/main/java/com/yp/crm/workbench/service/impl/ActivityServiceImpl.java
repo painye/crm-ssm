@@ -6,9 +6,13 @@ package com.yp.crm.workbench.service.impl;
 
 import com.yp.crm.workbench.domain.Activity;
 import com.yp.crm.workbench.mapper.ActivityMapper;
+import com.yp.crm.workbench.service.ActivityService;
 import org.aspectj.apache.bcel.generic.RET;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName : com.yp.crm.workbench.service.impl.ActivityServiceImpl
@@ -18,13 +22,24 @@ import org.springframework.stereotype.Service;
  */
 
 @Service("activityService")
-public class ActivityServiceImpl {
+public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private ActivityMapper activityMapper;
 
+    @Override
     public int addActivity(Activity activity){
-        return activityMapper.insert(activity);
+        return activityMapper.insertActivity(activity);
+    }
+
+    @Override
+    public List<Activity> queryActivityByConditionForPage(Map<String, Object> map) {
+        return activityMapper.selectActivityByConditionForPage(map);
+    }
+
+    @Override
+    public int queryActivityByConditionCounts(Map<String, Object> map) {
+        return activityMapper.selectActivityByConditionCounts(map);
     }
 
 

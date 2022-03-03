@@ -1,8 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-String basePath = request.getScheme() + "://" + request.getServerName() + ":" +
-request.getServerPort() + request.getContextPath() + "/";
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" +
+	request.getServerPort() + request.getContextPath() + "/";
 %>
 <html>
 <head>
@@ -15,11 +15,15 @@ request.getServerPort() + request.getContextPath() + "/";
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+<!--分页查询插件-->
+
+<link rel="stylesheet" type="text/css" href="jquery/bs_pagination-master/css/jquery.bs_pagination.min.css">
+<script type="text/javascript" src="jquery/bs_pagination-master/js/jquery.bs_pagination.min.js"></script>
+<script type="text/javascript" src="jquery/bs_pagination-master/localization/en.js"></script>
 
 <script type="text/javascript">
 
 	$(function(){
-
 		//绑定创建活动的按钮
 		$("#createActivityBtn").click(function () {
 			//重置表单
@@ -56,7 +60,6 @@ request.getServerPort() + request.getContextPath() + "/";
 			if(!regExp.test(cost)){
 				alert("成本只能是非负整数")
 			}
-
 			//非负请求
 			$.ajax({
 				url : "workbench/activity/createActivity.do",
@@ -73,13 +76,12 @@ request.getServerPort() + request.getContextPath() + "/";
 				success : function (data) {
 					if(data.code == 1){
 						//保存成功
-
+						queryActivityByConditionForPage(1,$("#demo_pag1").bs_pagination("getOption", 'rowsPerPage'));
 						//关闭模态窗口
 						$("#createActivityModal").modal("hide");
 					}else{
 						alert("保存失败");
 					}
-
 				}
 			});
 		})
@@ -90,31 +92,35 @@ request.getServerPort() + request.getContextPath() + "/";
 			format : "yyyy-mm-dd",
 			minView: 'month',
 			initialDate : new Date(),	//初始化显示的日期
-			autoclose : true ,//选择完日期之后是否默认关闭
+			autoclose : true,//选择完日期之后是否默认关闭
 			todayBtn: true,
 			clearBtn : true
 		});
 
-		queryActivityByConditionForPage();
+		queryActivityByConditionForPage(1,10);
 
 		//为查询按钮绑定事件
         $("#queryActivityByConditionBtn").click(function () {
-			queryActivityByConditionForPage();
+			queryActivityByConditionForPage(1, $("#demo_pag1").bs_pagination("getOption", 'rowsPerPage'));
 		});
+
+        //为全选事件绑定
+		$("#checkAll").click(function () {
+			
+		})
+
 
 	});
 
 
 
 
-	function queryActivityByConditionForPage() {
+	function queryActivityByConditionForPage(pageNo,pageSize ) {
 		var name = $.trim($("#query-name").val());
 		var owner = $.trim($("#query-owner").val());
 		var startDate = $.trim($("#query-startDate").val());
 		var endDate = $.trim($("#query-endDate").val());
 
-		var pageNo = 1;
-		var pageSize = 10;
 		$.ajax({
 			url : "workbench/activity/queryActivityByConditionForPage.do",
 			data:{
@@ -140,6 +146,31 @@ request.getServerPort() + request.getContextPath() + "/";
 					html+='  </tr>';
 				})
 				$("#tbody").html(html);
+
+				//计算总页数
+				var totalPages=1;
+				if(data.totalRows%pageSize==0){
+					totalPages=parseInt(data.totalRows/pageSize);
+				}else
+				{
+					totalPages=parseInt(data.totalRows/pageSize)+1;
+				}
+
+				//调用分页插件
+				$("#demo_pag1").bs_pagination({
+					currentPage:pageNo,  //当前页，相当于pageNO
+					rowsPerPage: pageSize, //pageSize
+					totalRows:data.totalRows,
+					totalPages: totalPages,
+					visiblePageLinks: 5, //最多可以显示的卡片数
+					showGoToPage: true,
+					showRowsPerPage: true,
+					showRowInfo:true,
+					//页面发生变化的时候，再次调用分页函数
+					onChangePage: function (event, pageObj) {
+						queryActivityByConditionForPage(pageObj.currentPage, pageObj.rowsPerPage);
+					}
+				})
 			}
 		});
 	}
@@ -244,11 +275,11 @@ request.getServerPort() + request.getContextPath() + "/";
 						<div class="form-group">
 							<label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-startTime" value="2020-10-10">
+								<input type="text" class="form-control myDate" id="edit-startTime" value="2020-10-10">
 							</div>
 							<label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-endTime" value="2020-10-20">
+								<input type="text" class="form-control myDate" id="edit-endTime" value="2020-10-20">
 							</div>
 						</div>
 						
@@ -347,13 +378,13 @@ request.getServerPort() + request.getContextPath() + "/";
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">开始日期</div>
-					  <input class="form-control" type="text" id="query-startDate" />
+					  <input class="form-control myDate" type="text" id="query-startDate" />
 				    </div>
 				  </div>
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">结束日期</div>
-					  <input class="form-control" type="text" id="query-endDate">
+					  <input class="form-control myDate" type="text" id="query-endDate">
 				    </div>
 				  </div>
 				  
@@ -377,7 +408,7 @@ request.getServerPort() + request.getContextPath() + "/";
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input type="checkbox" id="checkAll"/></td>
 							<td>名称</td>
                             <td>所有者</td>
 							<td>开始日期</td>
@@ -402,42 +433,43 @@ request.getServerPort() + request.getContextPath() + "/";
 
 					</tbody>
 				</table>
+				<div id="demo_pag1"></div>
 			</div>
 			
-			<div style="height: 50px; position: relative;top: 30px;">
-				<div>
-					<button type="button" class="btn btn-default" style="cursor: default;">共<b id="totalRowsB"></b>条记录</button>
-				</div>
-				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							10
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">20</a></li>
-							<li><a href="#">30</a></li>
-						</ul>
-					</div>
-					<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-				</div>
-				<div style="position: relative;top: -88px; left: 285px;">
-					<nav>
-						<ul class="pagination">
-							<li class="disabled"><a href="#">首页</a></li>
-							<li class="disabled"><a href="#">上一页</a></li>
-							<li class="active"><a href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">4</a></li>
-							<li><a href="#">5</a></li>
-							<li><a href="#">下一页</a></li>
-							<li class="disabled"><a href="#">末页</a></li>
-						</ul>
-					</nav>
-				</div>
-			</div>
+<%--			<div style="height: 50px; position: relative;top: 30px;">--%>
+<%--				<div>--%>
+<%--					<button type="button" class="btn btn-default" style="cursor: default;">共<b id="totalRowsB"></b>条记录</button>--%>
+<%--				</div>--%>
+<%--				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">--%>
+<%--					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>--%>
+<%--					<div class="btn-group">--%>
+<%--						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">--%>
+<%--							10--%>
+<%--							<span class="caret"></span>--%>
+<%--						</button>--%>
+<%--						<ul class="dropdown-menu" role="menu">--%>
+<%--							<li><a href="#">20</a></li>--%>
+<%--							<li><a href="#">30</a></li>--%>
+<%--						</ul>--%>
+<%--					</div>--%>
+<%--					<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>--%>
+<%--				</div>--%>
+<%--				<div style="position: relative;top: -88px; left: 285px;">--%>
+<%--					<nav>--%>
+<%--						<ul class="pagination">--%>
+<%--							<li class="disabled"><a href="#">首页</a></li>--%>
+<%--							<li class="disabled"><a href="#">上一页</a></li>--%>
+<%--							<li class="active"><a href="#">1</a></li>--%>
+<%--							<li><a href="#">2</a></li>--%>
+<%--							<li><a href="#">3</a></li>--%>
+<%--							<li><a href="#">4</a></li>--%>
+<%--							<li><a href="#">5</a></li>--%>
+<%--							<li><a href="#">下一页</a></li>--%>
+<%--							<li class="disabled"><a href="#">末页</a></li>--%>
+<%--						</ul>--%>
+<%--					</nav>--%>
+<%--				</div>--%>
+<%--			</div>--%>
 			
 		</div>
 		

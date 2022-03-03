@@ -56,7 +56,7 @@ public class UserController {
         if(user == null){
             retObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
             retObject.setMessage("账户密码错误");
-        }else if(nowStr.compareTo(user.getExpiretime()) < 0){
+        }else if(nowStr.compareTo(user.getExpiretime()) > 0){
             //登陆失败，该账号已过期
             retObject.setMessage("该账号已过期");
             retObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
