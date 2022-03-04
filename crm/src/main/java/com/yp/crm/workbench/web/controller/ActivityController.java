@@ -250,11 +250,11 @@ public class ActivityController {
             i++;
         }
 
-        OutputStream os = new FileOutputStream("C:\\Users\\dell\\Desktop\\activityList.xls");
-        wb.write(os);
-
-        os.flush();
-        wb.close();
+//        OutputStream os = new FileOutputStream("C:\\Users\\dell\\Desktop\\activityList.xls");
+//        wb.write(os);
+//
+//        os.flush();
+//        wb.close();
 
 
         //将文件发到浏览器上
@@ -265,14 +265,14 @@ public class ActivityController {
         //设置响应头信息，当浏览器接受到后台发送过来的文件的时候不是直接打开该文件而是
         //以附件的形式直接下载
         response.addHeader("Content-Disposition", "attachment;filename=MyActivityList.xls");
-        InputStream is = new FileInputStream("C:\\Users\\dell\\Desktop\\activityList.xls");
-        byte[] buff = new byte[256];
-        int len = 0;
-        while((len = is.read(buff))!=-1){
-            out.write(buff, 0 ,len);
-        }
-        is.close();
+//        InputStream is = new FileInputStream("C:\\Users\\dell\\Desktop\\activityList.xls");
+//        byte[] buff = new byte[256];
+//        int len = 0;
+//        while((len = is.read(buff))!=-1){
+//            out.write(buff, 0 ,len);
+//        }
+        wb.write(out);
+        wb.close();
         out.flush();
     }
-
 }
