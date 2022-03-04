@@ -27,4 +27,6 @@ public interface ActivityService {
     List<Activity> queryCheckedActivityById(String[] ids);
 
     int addActivityByList(List<Activity> activityList);
+
+    Activity queryActivityForDetailById(String id);
 }
