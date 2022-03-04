@@ -23,4 +23,8 @@ public interface ActivityService {
     int editActivityByCondition(Activity activity);
 
     List<Activity> queryAllActivity();
+
+    List<Activity> queryCheckedActivityById(String[] ids);
+
+    int addActivityByList(List<Activity> activityList);
 }

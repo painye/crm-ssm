@@ -226,6 +226,63 @@
 
 		});
 
+		// 选择导出文件绑定事件
+		$("#exportActivityXzBtn").click(function () {
+			var url = "workbench/activity/queryCheckedActivityById.do?id="
+			var checkedId = $("#tbody input[type='checkbox']:checked");
+			if(checkedId.size()==0){
+				alert("请选择您想要下载的信息");
+				return ;
+			}
+			var id="";
+			$.each(checkedId, function (index, object) {
+				id += object.value+"&id=";
+			})
+			id = id.substr(0, id.length-4)
+			window.location.href=url+id;
+		})
+
+		//为上传文件导入按钮模态窗口绑定事件
+		$("#importActivityBtn").click(function () {
+			var activityFileName = $("#activityFile").val();
+			var suffix = activityFileName.substr(activityFileName.indexOf(".")+1).toLowerCase();
+			if(suffix!="xls"){
+				alert("请选择xls格式的文件");
+				return;
+			}
+			//获取文件本身
+			var activityFile = $("#activityFile").get(0).files[0];
+			if(activityFile.size>5*1024*1024){
+				alert("文件不能大于5m");
+				return;
+			}
+
+			var formData =new FormData();
+			formData.append("activityFile", activityFile)
+
+			//发送请求
+			$.ajax({
+				url : "workbench/activity/addActivityByList.do",
+				processData:false,
+				contentType:false,
+				data: formData,
+				dataType:"json",
+				type : "post",
+				success : function (data) {
+					if(data.code=='1'){
+						alert(data.message);
+						$("#importActivityModal").modal("hide");
+						queryActivityByConditionForPage(1,  $("#demo_pag1").bs_pagination("getOption", "rowsPerPage"));
+					}else{
+						alert(data.message);
+
+					}
+
+				}
+			})
+
+
+		})
 	});
 
 

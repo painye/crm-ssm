@@ -63,4 +63,8 @@ public interface ActivityMapper {
     Activity selectActivityById(String id);
 
     List<Activity> selectAllActivity();
+
+    List<Activity> selectCheckedActivityById(String[] ids);
+
+    int insertActivityByList(List<Activity> activityList);
 }
