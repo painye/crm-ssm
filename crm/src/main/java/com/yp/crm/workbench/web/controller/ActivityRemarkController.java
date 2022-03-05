@@ -59,4 +59,50 @@ public class ActivityRemarkController {
         }
         return returnObject;
     }
+
+    @RequestMapping("deleteActivityRemark.do")
+    @ResponseBody
+    public Object deleteActivityRemark(String id){
+        ReturnObject  returnObject = new ReturnObject();
+        try {
+            int nums = activityRemarkService.deleteActivityRemark(id);
+            if(nums == 1){
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+            }else{
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+                returnObject.setMessage("系统正忙,请稍后...");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+            returnObject.setMessage("系统正忙,请稍后...");
+        }
+        return  returnObject;
+    }
+
+    @RequestMapping("editActivityRemark.do")
+    @ResponseBody
+    public Object editActivityRemark(ActivityRemark activityRemark, HttpSession httpSession){
+        ReturnObject returnObject=new ReturnObject();
+        activityRemark.setEditFlag("1");
+        activityRemark.setEditTime(DateUtils.formateDateTime(new Date()));
+        User user = (User) httpSession.getAttribute(Constants.SESSION_USER);
+        activityRemark.setEditBy(user.getId());
+
+        try{
+            int nums = activityRemarkService.editActivityRemark(activityRemark);
+            if(nums ==1){
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+                returnObject.setRetObject(activityRemark);
+            }else{
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+                returnObject.setMessage("系统正忙，请稍后....");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+            returnObject.setMessage("系统正忙，请稍后....");
+        }
+        return returnObject;
+    }
 }

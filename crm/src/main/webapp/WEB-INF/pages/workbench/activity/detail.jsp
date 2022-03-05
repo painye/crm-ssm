@@ -74,6 +74,10 @@ request.getServerPort() + request.getContextPath() + "/";
 
 			//获取传递的参数
 			var noteContent = $.trim($("#remark").val());
+			if(noteContent==""){
+				alert("备注内容不能为空");
+				return;
+			}
 			var activityId= '${activity.id}';
 
 			//发送ajax请求
@@ -91,19 +95,19 @@ request.getServerPort() + request.getContextPath() + "/";
 						//清空文本框
 						$("#remark").val("");
 						//动态刷新添加刚存入的市场活动备注记录
-						html += ' 	<div id="'+data.retObject.id+'" class="remarkDiv" style="height: 60px;">';
+						html += ' 	<div id="div_'+data.retObject.id+'" class="remarkDiv" style="height: 60px;">';
 						html += ' 			<img title="'+data.retObject.createBy+'" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
 						html += ' 			<div style="position: relative; top: -40px; left: 40px;" >';
-						html += ' 			<h5>'+data.retObject.noteContent+'</h5>';
-						html += ' 			<font color="gray">市场活动</font> <font color="gray">-</font> <b>${activity.name}</b> <small style="color: gray;">';
+						html += ' 			<h5 id="h5_'+data.retObject.id+'">'+data.retObject.noteContent+'</h5>';
+						html += ' 			<font color="gray">市场活动</font> <font color="gray">-</font> <b>${activity.name}</b> <small id="s_'+data.retObject.id+'" style="color: gray;">';
 						html += data.retObject.createTime;
 						html += ' 由'+data.retObject.createBy;
 						html += ' 创建'
 						html += ' 	</small>';
 						html += ' 	<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">';
-						html += ' 			<a class="myHref" remarkId="'+data.retObject.id+'" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>';
+						html += ' 	<a class="myHref" name="editActivityRemarkBtn" remarkId="'+data.retObject.id+'" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>';
 						html += ' 		&nbsp;&nbsp;&nbsp;&nbsp;';
-						html += ' 	<a class="myHref"  remarkId="'+data.retObject.id+'" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>';
+						html += ' 	<a class="myHref" name="deleteActivityRemarkBtn" remarkId="'+data.retObject.id+'" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>';
 						html += ' 	</div>';
 						html += ' 	</div>';
 						html += ' 	</div>';
@@ -112,7 +116,69 @@ request.getServerPort() + request.getContextPath() + "/";
 					}
 				}
 			})
+		});
+
+		//为删除市场活动备注的按钮绑定事件
+		$("#remarkListDiv").on("click", "a[name='deleteActivityRemarkBtn']", function () {
+			var id=$(this).attr("remarkId");
+			$.ajax({
+				url:"workbench/activity/deleteActivityRemark.do",
+				data:{
+					id:id
+				},
+				dataType:"json",
+				type:"post",
+				success : function (data) {
+					if(data.code=='1'){
+						//刷星列表删除该记录
+						$("#div_"+id).remove();
+					}else{
+						alert(data.message);
+					}
+
+				}
+			})
 		})
+
+
+		//为修改市场活动备注的按钮绑定事件
+		$("#remarkListDiv").on("click", "a[name='editActivityRemarkBtn']", function () {
+			var id=$(this).attr("remarkId");
+			var noteContent = $("#h5_"+id).html();
+			$("#editRemarkModal").modal("show");
+			$("#noteContent").val(noteContent);
+			$("#remarkId").val(id);
+		})
+
+		//为修改备注的模态窗口绑定事件
+		$("#updateRemarkBtn").click(function () {
+			var id=$("#remarkId").val();
+			$("#editActivityModal").modal("hide");
+			var noteContent=$.trim($("#noteContent").val());
+			$.ajax({
+				url:"workbench/activity/editActivityRemark.do",
+				data:{
+					id:id,
+					noteContent:noteContent
+				},
+				dataType:"json",
+				type:"post",
+				success: function (data) {
+					if(data.code == "1"){
+						//修改列表中的内容
+						$("#h5_"+id).html(noteContent);
+						$("#s_"+id).html(data.retObject.editTime+" 由"+"${sessionScope.sessionUser.name} 修改");
+						$("#editActivityModal").modal("hide");
+					}else{
+						alert(data.message);
+					}
+
+				}
+			})
+		})
+
+
+
 	});
 	
 </script>
@@ -249,19 +315,19 @@ request.getServerPort() + request.getContextPath() + "/";
 <%--		</div>--%>
 		<c:forEach items="${activityRemarkList}" var="remark">
 
-			<div id="${reamrk.id}" class="remarkDiv" style="height: 60px;">
+			<div id="div_${remark.id}" class="remarkDiv" style="height: 60px;">
 				<img title="${remark.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
 				<div style="position: relative; top: -40px; left: 40px;" >
-					<h5>${remark.noteContent}</h5>
-					<font color="gray">市场活动</font> <font color="gray">-</font> <b>${activity.name}</b> <small style="color: gray;">
+					<h5 id="h5_${remark.id}">${remark.noteContent}</h5>
+					<font color="gray">市场活动</font> <font color="gray">-</font> <b>${activity.name}</b> <small id="s_${remark.id}" style="color: gray;">
 						${remark.editFlag=='1'? remark.editTime:remark.createTime}
-							由${remark.editFlag=='1'? remark.edtitBy:remark.createBy}
+							由${remark.editFlag=='1'? remark.editBy:remark.createBy}
 							${remark.editFlag=='1'?'修改':'创建'}
 						</small>
 					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
-						<a class="myHref" remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
+						<a class="myHref" name="editActivityRemarkBtn" remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
 						&nbsp;&nbsp;&nbsp;&nbsp;
-						<a class="myHref"  remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>
+						<a class="myHref" name="deleteActivityRemarkBtn" remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>
 					</div>
 				</div>
 			</div>
