@@ -37,21 +37,82 @@ request.getServerPort() + request.getContextPath() + "/";
 			cancelAndSaveBtnDefault = true;
 		});
 		
-		$(".remarkDiv").mouseover(function(){
+		// $(".remarkDiv").mouseover(function(){
+		// 	$(this).children("div").children("div").show();
+		// });
+
+		$("#remarkListDiv").on("mouseover", ".remarkDiv", function () {
 			$(this).children("div").children("div").show();
-		});
-		
-		$(".remarkDiv").mouseout(function(){
+		})
+
+		// $(".remarkDiv").mouseout(function(){
+		// 	$(this).children("div").children("div").hide();
+		// });
+
+		$("#remarkListDiv").on("mouseout", ".remarkDiv", function () {
 			$(this).children("div").children("div").hide();
-		});
+		})
 		
-		$(".myHref").mouseover(function(){
+		// $(".myHref").mouseover(function(){
+		// 	$(this).children("span").css("color","red");
+		// });
+
+		$("#remarkListDiv").on("mouseover", ".myHref", function () {
 			$(this).children("span").css("color","red");
-		});
+		})
 		
-		$(".myHref").mouseout(function(){
-			$(this).children("span").css("color","#E6E6E6");
-		});
+		// $(".myHref").mouseout(function(){
+		// 	$(this).children("span").css("color","#E6E6E6");
+		// });
+
+		$("#remarkListDiv").on("mouseout", ".myHref", function () {
+			$(this).children("span").css("color","E6E6E6");
+		})
+
+		//为保存市场活动备注按钮绑定事件
+		$("#createActivityRemarkBtn").click(function () {
+
+			//获取传递的参数
+			var noteContent = $.trim($("#remark").val());
+			var activityId= '${activity.id}';
+
+			//发送ajax请求
+			$.ajax({
+				url:"workbench/activity/createActivityRemark.do",
+				data:{
+					noteContent:noteContent,
+					activityId:activityId
+				},
+				dataType:"json",
+				type:"post",
+				success : function (data) {
+					var html="";
+					if(data.code=="1"){
+						//清空文本框
+						$("#remark").val("");
+						//动态刷新添加刚存入的市场活动备注记录
+						html += ' 	<div id="'+data.retObject.id+'" class="remarkDiv" style="height: 60px;">';
+						html += ' 			<img title="'+data.retObject.createBy+'" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
+						html += ' 			<div style="position: relative; top: -40px; left: 40px;" >';
+						html += ' 			<h5>'+data.retObject.noteContent+'</h5>';
+						html += ' 			<font color="gray">市场活动</font> <font color="gray">-</font> <b>${activity.name}</b> <small style="color: gray;">';
+						html += data.retObject.createTime;
+						html += ' 由'+data.retObject.createBy;
+						html += ' 创建'
+						html += ' 	</small>';
+						html += ' 	<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">';
+						html += ' 			<a class="myHref" remarkId="'+data.retObject.id+'" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>';
+						html += ' 		&nbsp;&nbsp;&nbsp;&nbsp;';
+						html += ' 	<a class="myHref"  remarkId="'+data.retObject.id+'" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>';
+						html += ' 	</div>';
+						html += ' 	</div>';
+						html += ' 	</div>';
+
+						$("#remarkDiv").before(html);
+					}
+				}
+			})
+		})
 	});
 	
 </script>
@@ -154,7 +215,7 @@ request.getServerPort() + request.getContextPath() + "/";
 	</div>
 	
 	<!-- 备注 -->
-	<div style="position: relative; top: 30px; left: 40px;">
+	<div id="remarkListDiv" style="position: relative; top: 30px; left: 40px;">
 		<div class="page-header">
 			<h4>备注</h4>
 		</div>
@@ -187,7 +248,8 @@ request.getServerPort() + request.getContextPath() + "/";
 <%--			</div>--%>
 <%--		</div>--%>
 		<c:forEach items="${activityRemarkList}" var="remark">
-			<div class="remarkDiv" style="height: 60px;">
+
+			<div id="${reamrk.id}" class="remarkDiv" style="height: 60px;">
 				<img title="${remark.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
 				<div style="position: relative; top: -40px; left: 40px;" >
 					<h5>${remark.noteContent}</h5>
@@ -209,7 +271,7 @@ request.getServerPort() + request.getContextPath() + "/";
 				<textarea id="remark" class="form-control" style="width: 850px; resize : none;" rows="2"  placeholder="添加备注..."></textarea>
 				<p id="cancelAndSaveBtn" style="position: relative;left: 737px; top: 10px; display: none;">
 					<button id="cancelBtn" type="button" class="btn btn-default">取消</button>
-					<button type="button" class="btn btn-primary">保存</button>
+					<button type="button" class="btn btn-primary" id="createActivityRemarkBtn">保存</button>
 				</p>
 			</form>
 		</div>
