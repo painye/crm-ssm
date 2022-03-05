@@ -312,7 +312,7 @@
 				$.each(data.activityList, function(index, object) {
 					html+='  <tr class="active">';
 					html+='  		<td><input type="checkbox" value="'+object.id+'"/></td>';
-					html+='  		<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.jsp\';">'+object.name+'</a></td>';
+					html+='  		<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/queryActivityRemarkByActivityId.do?id='+object.id+'\';">'+object.name+'</a></td>';
 					html+='  <td>'+object.owner+'</td>';
 					html+='  <td>'+object.startdate+'</td>';
 					html+='  <td>'+object.enddate+'</td>';

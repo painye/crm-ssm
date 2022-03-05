@@ -165,4 +165,19 @@
       activity_id = #{activityId,jdbcType=CHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
+
+  <select id="selectActivityRemarkByActivityId" resultMap="BaseResultMap">
+    select ar.id, ar.note_content, ar.create_time,u1.name as create_by,
+        ar.edit_time,  u2.name as edit_by, ar.edit_flag
+    from tbl_activity_remark ar
+    join tbl_user u1 on ar.create_by = u1.id
+    left join tbl_user u2 on ar.edit_by = u2.id
+    where ar.activity_id = #{id}
+  </select>
+
+  <insert id="insertActivityRemark">
+    insert into tbl_activity_remark
+    (id,note_content ,create_time , create_by, edit_flag) values
+    (#{id},#{noteContent},#{createTime},#{createBy},#{editFlag})
+  </insert>
 </mapper>

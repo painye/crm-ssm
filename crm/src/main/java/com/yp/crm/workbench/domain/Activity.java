@@ -352,4 +352,21 @@ public class Activity {
     public void setEditby(String editby) {
         this.editby = editby == null ? null : editby.trim();
     }
+
+    @Override
+    public String toString() {
+        return "Activity{" +
+                "id='" + id + '\'' +
+                ", owner='" + owner + '\'' +
+                ", name='" + name + '\'' +
+                ", startdate='" + startdate + '\'' +
+                ", enddate='" + enddate + '\'' +
+                ", cost='" + cost + '\'' +
+                ", description='" + description + '\'' +
+                ", createtime='" + createtime + '\'' +
+                ", createby='" + createby + '\'' +
+                ", edittime='" + edittime + '\'' +
+                ", editby='" + editby + '\'' +
+                '}';
+    }
 }

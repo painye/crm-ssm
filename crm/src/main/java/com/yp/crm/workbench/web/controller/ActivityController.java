@@ -11,6 +11,8 @@ import com.yp.crm.common.utils.UUIDUtils;
 import com.yp.crm.settings.domain.User;
 import com.yp.crm.settings.service.UserService;
 import com.yp.crm.workbench.domain.Activity;
+import com.yp.crm.workbench.domain.ActivityRemark;
+import com.yp.crm.workbench.service.ActivityRemarkService;
 import com.yp.crm.workbench.service.ActivityService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -19,12 +21,11 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.rmi.CORBA.Util;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -47,6 +48,9 @@ public class ActivityController {
 
     @Autowired
     private ActivityService activityService;
+
+    @Autowired
+    private ActivityRemarkService activityRemarkService;
 
     @RequestMapping("/index.do")
     public ModelAndView index(){
@@ -414,6 +418,15 @@ public class ActivityController {
             retObject.setMessage("系统正忙，请稍后");
         }
         return retObject;
+    }
+
+    @RequestMapping("/queryActivityRemarkByActivityId.do")
+    public String queryActivityRemarkByActivityId(String id, HttpServletRequest request){
+        List<ActivityRemark> activityRemarkList = activityRemarkService.queryActivityRemarkByActivityId(id);
+        Activity activity = activityService.queryActivityForDetailById(id);
+        request.setAttribute("activityRemarkList", activityRemarkList);
+        request.setAttribute("activity", activity);
+        return "workbench/activity/detail";
     }
 
 

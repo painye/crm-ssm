@@ -1,6 +1,7 @@
 package com.yp.crm.workbench.service;
 
 import com.yp.crm.workbench.domain.Activity;
+import com.yp.crm.workbench.domain.ActivityRemark;
 
 import java.util.List;
 import java.util.Map;
@@ -29,4 +30,5 @@ public interface ActivityService {
     int addActivityByList(List<Activity> activityList);
 
     Activity queryActivityForDetailById(String id);
+
 }
