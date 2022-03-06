@@ -325,13 +325,16 @@
         c.fullname like '%' #{fullname} '%'
     </if>
     <if test="company!=null and company!=''">
-      c.company like '%'#{company}'%'
+     and  c.company like '%'#{company}'%'
     </if>
-    <if test="owner!=null and owner!=''">
-      owner like '%'#{owner}'%'
+    <if test="owner !=null and owner!=''">
+      and u1.name like '%' #{owner} '%'
     </if>
     <if test="source != null and source !=''">
-      source like '%'#{source}'%'
+      and source  = #{source}
+    </if>
+    <if test="state != null and state !=''">
+      and state = #{state}
     </if>
     </where>
     order by c.create_time desc
@@ -349,16 +352,16 @@
         c.fullname like '%' #{fullname} '%'
       </if>
       <if test="company!=null and company!=''">
-        c.company like '%'#{company}'%'
+        and  c.company like '%'#{company}'%'
       </if>
       <if test="owner!=null and owner!=''">
-        owner like '%'#{owner}'%'
+        and u1.name like '%' #{owner} '%'
       </if>
       <if test="source != null and source !=''">
-        source like '%'#{source}'%'
+        and source  = #{source}
       </if>
-      <if test="state!=null and state!=''">
-        state like '%'#{state}'%'
+      <if test="state != null and state !=''">
+        and state = #{state}
       </if>
     </where>
   </select>

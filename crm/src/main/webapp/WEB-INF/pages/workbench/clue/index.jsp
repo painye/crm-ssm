@@ -110,6 +110,11 @@ request.getServerPort() + request.getContextPath() + "/";
 		});
 
 		queryClueByConditionForPage(1, 10);
+
+		//为查询按钮绑定事件
+		$("#searchBtn").click(function () {
+			queryClueByConditionForPage(1, $("#demo_pag1").bs_pagination("getOption", "rowsPerPage"));
+		})
 		
 	});
 
@@ -139,7 +144,7 @@ request.getServerPort() + request.getContextPath() + "/";
 				$.each(data.clueList, function (index, object) {
 					html+= ' <tr>';
 					html+= ' <td><input type="checkbox" value="'+object.id+'"/></td>';
-					html+= ' 		<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'detail.html\';">'+object.fullname+object.appellation+'</a></td>';
+					html+= ' 		<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench\clue\detail.do\';">'+object.fullname+object.appellation+'</a></td>';
 					html+= ' <td>'+object.company+'</td>';
 					html+= ' <td>'+object.phone+'</td>';
 					html+= ' <td>'+object.mphone+'</td>';
@@ -612,13 +617,13 @@ request.getServerPort() + request.getContextPath() + "/";
 <%--					  	<option>需要条件</option>--%>
 						<option></option>
 						<c:forEach items="${clueStates}" var="clueState">
-							<option id="${clueState.id}">${clueState.text}</option>
+							<option id="${clueState.id}" value="${clueState.id}">${clueState.text}</option>
 						</c:forEach>
 					  </select>
 				    </div>
 				  </div>
 
-				  <button type="submit" class="btn btn-default">查询</button>
+				  <button type="button" class="btn btn-default" id="searchBtn">查询</button>
 				  
 				</form>
 			</div>
@@ -648,7 +653,7 @@ request.getServerPort() + request.getContextPath() + "/";
 					<tbody id="tbody">
 <%--						<tr>--%>
 <%--							<td><input type="checkbox" /></td>--%>
-<%--							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">李四先生</a></td>--%>
+<%--							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">李四先生</a></td>--%>
 <%--							<td>动力节点</td>--%>
 <%--							<td>010-84846003</td>--%>
 <%--							<td>12345678901</td>--%>
@@ -658,7 +663,7 @@ request.getServerPort() + request.getContextPath() + "/";
 <%--						</tr>--%>
 <%--                        <tr class="active">--%>
 <%--                            <td><input type="checkbox" /></td>--%>
-<%--                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">李四先生</a></td>--%>
+<%--                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">李四先生</a></td>--%>
 <%--                            <td>动力节点</td>--%>
 <%--                            <td>010-84846003</td>--%>
 <%--                            <td>12345678901</td>--%>
