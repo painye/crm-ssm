@@ -22,7 +22,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName : com.yp.crm.workbench.web.controller.ClueController
@@ -80,5 +82,26 @@ public class ClueController {
             returnObject.setMessage("系统正忙，请稍后...");
         }
         return returnObject;
+    }
+
+    @RequestMapping("/queryClueByConditionForPage.do")
+    @ResponseBody
+    public Object queryClueByConditionForPage(String fullname, String company, String source, String owner,
+                                              Integer pageNo, Integer pageSize,String state){
+        Map<String, Object> map =new HashMap<>();
+        map.put("fullname", fullname);
+        map.put("company",company );
+        map.put("source",source );
+        map.put("owner", owner);
+        map.put("state", state);
+        map.put("pageNo", (pageNo-1)*pageSize);
+        map.put("pageSize", pageSize);
+        Map<String, Object> retMap = new HashMap<>();
+
+        List<Clue> clueList = clueService.queryClueByConditionForPage(map);
+        int totalRows = clueService.queryClueCountByCondition(map);
+        retMap.put("clueList", clueList);
+        retMap.put("totalRows", totalRows);
+        return retMap;
     }
 }

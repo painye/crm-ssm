@@ -308,4 +308,59 @@
     where id = #{id,jdbcType=CHAR}
   </update>
 
+  <select id="queryClueByConditionForPage" resultMap="BaseResultMap">
+    select c.id, c.fullname, v1.value as appellation,u1.name as owner,
+			c.company, c.job,c.email,c.phone,c.website, c.mphone,
+			v2.value as state,v3.value as source, c.create_time, u2.name as createBy, c.edit_time,
+			u3.name as editBy, c.description, c.next_contact_time, c.address
+    from tbl_clue c
+    join tbl_dic_value v1 on c.appellation = v1.id
+    join tbl_dic_value v2 on c.state = v2.id
+    join tbl_dic_value v3 on c.source = v3.id
+    join tbl_user u1 on c.owner = u1.id
+    join tbl_user u2 on c.create_by = u2.id
+    left join tbl_user u3 on c.edit_by = u3.id
+    <where>
+      <if test="fullname != null and fullname != ''">
+        c.fullname like '%' #{fullname} '%'
+    </if>
+    <if test="company!=null and company!=''">
+      c.company like '%'#{company}'%'
+    </if>
+    <if test="owner!=null and owner!=''">
+      owner like '%'#{owner}'%'
+    </if>
+    <if test="source != null and source !=''">
+      source like '%'#{source}'%'
+    </if>
+    </where>
+    order by c.create_time desc
+    limit #{pageNo} ,#{pageSize}
+  </select>
+
+  <select id="queryClueCountsByCondition" resultType="int">
+    select count(*)
+    from tbl_clue c
+    join tbl_user u1 on c.owner = u1.id
+    join tbl_user u2 on c.create_by = u2.id
+    left join tbl_user u3 on c.edit_by = u3.id
+    <where>
+      <if test="fullname != null and fullname != ''">
+        c.fullname like '%' #{fullname} '%'
+      </if>
+      <if test="company!=null and company!=''">
+        c.company like '%'#{company}'%'
+      </if>
+      <if test="owner!=null and owner!=''">
+        owner like '%'#{owner}'%'
+      </if>
+      <if test="source != null and source !=''">
+        source like '%'#{source}'%'
+      </if>
+      <if test="state!=null and state!=''">
+        state like '%'#{state}'%'
+      </if>
+    </where>
+  </select>
+
 </mapper>
