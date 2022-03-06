@@ -4,6 +4,7 @@ package com.yp.crm.workbench.web.controller;
  * @date 2022/3/6 9:54
  */
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import com.yp.crm.common.Constant.Constants;
 import com.yp.crm.common.domain.ReturnObject;
 import com.yp.crm.common.utils.DateUtils;
@@ -104,4 +105,64 @@ public class ClueController {
         retMap.put("totalRows", totalRows);
         return retMap;
     }
+
+
+    @RequestMapping("/deleteClue.do")
+    @ResponseBody
+    public Object deleteClue(String id){
+        ReturnObject returnObject=new ReturnObject();
+        try{
+            int nums = clueService.deleteClueById(id);
+            if(nums == 1){
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+            }else {
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+                returnObject.setMessage(Constants.RETURN_OBJECT_MESSAGE);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+            returnObject.setMessage(Constants.RETURN_OBJECT_MESSAGE);
+        }
+        return returnObject;
+    }
+
+    @RequestMapping("/editClue.do")
+    @ResponseBody
+    public Object editClue(Clue clue, HttpSession session){
+        ReturnObject returnObject=new ReturnObject();
+        User user=(User) session.getAttribute(Constants.SESSION_USER);
+        clue.setEditBy(user.getId());
+        clue.setEditTime(DateUtils.formateDateTime(new Date()));
+        int nums = clueService.editClue(clue);
+        if(nums ==1){
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+        }else {
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+            returnObject.setMessage(Constants.RETURN_OBJECT_MESSAGE);
+        }
+        return returnObject;
+    }
+
+    @RequestMapping("/queryClue.do")
+    @ResponseBody
+    public Object queryClue(String id){
+        ReturnObject returnObject = new ReturnObject();
+        try{
+            Clue clue=clueService.queryClue(id);
+            if(clue!=null){
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+                returnObject.setRetObject(clue);
+            }else{
+                returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+                returnObject.setMessage(Constants.RETURN_OBJECT_MESSAGE);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+            returnObject.setMessage(Constants.RETURN_OBJECT_MESSAGE);
+        }
+        return returnObject;
+    }
+
 }

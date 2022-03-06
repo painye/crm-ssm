@@ -16,4 +16,6 @@ public class Constants {
     public static final String RETURN_OBJECT_CODE_FAIl="0";
 
     public static final String SESSION_USER="sessionUser";
+
+    public static final String RETURN_OBJECT_MESSAGE="系统正忙。请稍后...";
 }

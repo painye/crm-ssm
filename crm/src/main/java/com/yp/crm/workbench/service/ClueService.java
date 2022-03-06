@@ -31,4 +31,25 @@ public interface ClueService {
      * @return
      */
     int queryClueCountByCondition(Map<String, Object> map);
+
+    /**
+     * 根据id删除线索
+     * @param id
+     * @return
+     */
+    int deleteClueById(String id);
+
+    /**
+     * 修改线索
+     * @param clue
+     * @return
+     */
+    int editClue(Clue clue);
+
+    /**
+     * 根据id查找线索
+     * @param id
+     * @return
+     */
+    Clue queryClue(String id);
 }

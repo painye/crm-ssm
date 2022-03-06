@@ -115,7 +115,147 @@ request.getServerPort() + request.getContextPath() + "/";
 		$("#searchBtn").click(function () {
 			queryClueByConditionForPage(1, $("#demo_pag1").bs_pagination("getOption", "rowsPerPage"));
 		})
-		
+
+		//为全选按钮绑定事件
+		$("#checkAll").click(function () {
+			$("#tbody input[type = 'checkbox']").prop("checked", this.checked);
+		});
+
+		//未选择所有线索触发全选按钮
+		$("#tbody").on("click", "input[type='checkbox']", function () {
+			if($("#tbody input[type='checkbox']:checked").size()==$("#tbody input[type='checkbox']").size()){
+				$("#checkAll").prop("checked", true);
+			}else{
+				$("#checkAll").prop("checked", false);
+			}
+		});
+
+		//为删除线索的按钮绑定事件
+		$("#deleteClueBtn").click(function () {
+			//获取id参数
+			var checkedClue = $("#tbody input[type='checkbox']:checked");
+			if(checkedClue.size()!=1){
+				alert("请选中一条线索进行删除");
+				return;
+			}
+			var id=checkedClue[0].value;
+
+			//发送请求
+			$.ajax({
+				url:"workbench/clue/deleteClue.do",
+				data:{
+					id:id
+				},
+				dataType:"json",
+				type:"post",
+				success:function (data) {
+					if(data.code == "1"){
+						queryClueByConditionForPage(1, $("#demo_pag1").bs_pagination("getOption", "rowsPerPage"));
+					}else{
+						alert(data.message);
+					}
+
+				}
+			})
+		})
+
+		//为修改按钮绑定事件
+		$("#editClueBtn").click(function () {
+			var checkClue=$("#tbody input[type='checkbox']:checked");
+			if(checkClue.size()!=1){
+				alert("请选择一条线索");
+				return;
+			}
+			var id=checkClue[0].value;
+			//将iD注入到隐藏域中的id上去
+			$("#hideEditClueId").val(id);
+			$("#editClueModal").modal("show")
+
+			//发送ajax请求
+			$.ajax({
+				url:"workbench/clue/queryClue.do",
+				data:{
+					id:id
+				},
+				dataType:"json",
+				type:"post",
+				success:function (data) {
+					if(data.code == "1") {
+						$("#edit-fullname").val(data.retObject.fullname);
+						$("#edit-appellation").val(data.retObject.appellation);
+						$("#edit-owner").val(data.retObject.owner);
+						$("#edit-company").val(data.retObject.company);
+						$("#edit-job").val(data.retObject.job);
+						$("#edit-email").val(data.retObject.email);
+						$("#edit-phone").val(data.retObject.phone);
+						$("#edit-website").val(data.retObject.website);
+						$("#edit-mphone").val(data.retObject.mphone);
+						$("#edit-state").val(data.retObject.state);
+						$("#edit-source").val(data.retObject.source);
+						$("#edit-description").val(data.retObject.description);
+						$("#edit-contactSummary").val(data.retObject.contactSummary);
+						$("#edit-nextContactTime").val(data.retObject.nextContactTime);
+						$("#edit-address").val(data.retObject.address);
+					}else{
+						alert(data.message);
+					}
+				}
+			})
+		});
+
+		//为保存更新按钮绑定事件
+		$("#updateClueBtn").click(function () {
+			var id   = $("#hideEditClueId").val();
+			var fullname     	= $("#edit-fullname").val();
+			var appellation 	 = $("#edit-appellation").val();
+			var owner 			= $("#edit-owner").val();
+			var company 		= $("#edit-company").val();
+			var job 			= $("#edit-job").val();
+			var email 			= $("#edit-email").val();
+			var phone 			= $("#edit-phone").val();
+			var website 		= $("#edit-website").val();
+			var mphone 			= $("#edit-mphone").val();
+			var state 			= $("#edit-state").val();
+			var source 			= $("#edit-source").val();
+			var description 	= $("#edit-description").val();
+			var contactSummary	= $("#edit-contactSummary").val();
+			var nextContactTime = $("#edit-nextContactTime").val();
+			var address 		= $("#edit-address").val();
+
+			$.ajax({
+				url:"workbench/clue/editClue.do",
+				data:{
+					id : id,
+					fullname : fullname  ,
+					appellation : appellation,
+					owner : owner,
+					company : company,
+					job : job,
+					email : email,
+					phone : phone,
+					website : website,
+					mphone : mphone,
+					state : state,
+					source : source,
+					description : description,
+					contactSummary : contactSummary,
+					nextContactTime : nextContactTime,
+					address : address
+				},
+				dataType : "json",
+				Type:"post",
+				success:function (data) {
+					if(data.code == "1"){
+						$("#editClueModal").modal("hide");
+					}else{
+						alert(message);
+					}
+
+				}
+			})
+		})
+
+
 	});
 
 	function queryClueByConditionForPage(pageNo, pageSize) {
@@ -363,11 +503,11 @@ request.getServerPort() + request.getContextPath() + "/";
 				</div>
 				<div class="modal-body">
 					<form class="form-horizontal" role="form">
-					
+						<input type="hidden" id="hideEditClueId">
 						<div class="form-group">
-							<label for="edit-clueOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
+							<label for="edit-owner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="edit-clueOwner">
+								<select class="form-control" id="edit-owner">
 <%--								  <option>zhangsan</option>--%>
 <%--								  <option>lisi</option>--%>
 <%--								  <option>wangwu</option>--%>
@@ -383,9 +523,9 @@ request.getServerPort() + request.getContextPath() + "/";
 						</div>
 						
 						<div class="form-group">
-							<label for="edit-call" class="col-sm-2 control-label">称呼</label>
+							<label for="edit-appellation" class="col-sm-2 control-label">称呼</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="edit-call">
+								<select class="form-control" id="edit-appellation">
 <%--								  <option></option>--%>
 <%--								  <option selected>先生</option>--%>
 <%--								  <option>夫人</option>--%>
@@ -397,9 +537,9 @@ request.getServerPort() + request.getContextPath() + "/";
 									</c:forEach>
 								</select>
 							</div>
-							<label for="edit-surname" class="col-sm-2 control-label">姓名<span style="font-size: 15px; color: red;">*</span></label>
+							<label for="edit-fullname" class="col-sm-2 control-label">姓名<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-surname" value="李四">
+								<input type="text" class="form-control" id="edit-fullname" value="李四">
 							</div>
 						</div>
 						
@@ -430,9 +570,9 @@ request.getServerPort() + request.getContextPath() + "/";
 							<div class="col-sm-10" style="width: 300px;">
 								<input type="text" class="form-control" id="edit-mphone" value="12345678901">
 							</div>
-							<label for="edit-status" class="col-sm-2 control-label">线索状态</label>
+							<label for="edit-state" class="col-sm-2 control-label">线索状态</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="edit-status">
+								<select class="form-control" id="edit-state">
 <%--								  <option></option>--%>
 <%--								  <option>试图联系</option>--%>
 <%--								  <option>将来联系</option>--%>
@@ -475,9 +615,9 @@ request.getServerPort() + request.getContextPath() + "/";
 						</div>
 						
 						<div class="form-group">
-							<label for="edit-describe" class="col-sm-2 control-label">描述</label>
+							<label for="edit-description" class="col-sm-2 control-label">描述</label>
 							<div class="col-sm-10" style="width: 81%;">
-								<textarea class="form-control" rows="3" id="edit-describe">这是一条线索的描述信息</textarea>
+								<textarea class="form-control" rows="3" id="edit-description">这是一条线索的描述信息</textarea>
 							</div>
 						</div>
 						
@@ -513,7 +653,7 @@ request.getServerPort() + request.getContextPath() + "/";
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+					<button type="button" class="btn btn-primary" id="updateClueBtn">更新</button>
 				</div>
 			</div>
 		</div>
@@ -630,8 +770,8 @@ request.getServerPort() + request.getContextPath() + "/";
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 40px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
 				  <button type="button" class="btn btn-primary" id="createClueBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editClueModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button type="button" class="btn btn-default" id="editClueBtn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
+				  <button type="button" class="btn btn-danger" id="deleteClueBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				
 				
@@ -640,7 +780,7 @@ request.getServerPort() + request.getContextPath() + "/";
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input type="checkbox" id="checkAll"/></td>
 							<td>名称</td>
 							<td>公司</td>
 							<td>公司座机</td>
