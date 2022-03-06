@@ -155,6 +155,10 @@ request.getServerPort() + request.getContextPath() + "/";
 			var id=$("#remarkId").val();
 			$("#editActivityModal").modal("hide");
 			var noteContent=$.trim($("#noteContent").val());
+			if(noteContent == ""){
+				alert("备注内容不能为空");
+				return;
+			}
 			$.ajax({
 				url:"workbench/activity/editActivityRemark.do",
 				data:{
