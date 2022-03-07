@@ -67,10 +67,6 @@ public interface ClueMapper {
      */
     int queryClueCountsByCondition(Map<String, Object> map);
 
-    /**
-     * 修改线索的基本信息
-     * @param clue
-     * @return
-     */
+
 
 }

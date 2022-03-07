@@ -165,4 +165,9 @@ public class ClueController {
         return returnObject;
     }
 
+    @RequestMapping("/queryClueRemarkListById.do")
+    public String detail(){
+        
+        return "workbench/clue/detail";
+    }
 }

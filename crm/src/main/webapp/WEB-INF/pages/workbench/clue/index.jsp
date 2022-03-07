@@ -284,7 +284,7 @@ request.getServerPort() + request.getContextPath() + "/";
 				$.each(data.clueList, function (index, object) {
 					html+= ' <tr>';
 					html+= ' <td><input type="checkbox" value="'+object.id+'"/></td>';
-					html+= ' 		<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench\clue\detail.do\';">'+object.fullname+object.appellation+'</a></td>';
+					html+= ' 		<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/clue/detail.do\';">'+object.fullname+object.appellation+'</a></td>';
 					html+= ' <td>'+object.company+'</td>';
 					html+= ' <td>'+object.phone+'</td>';
 					html+= ' <td>'+object.mphone+'</td>';

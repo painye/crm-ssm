@@ -72,7 +72,7 @@
 
 
 
-        <table tableName="tbl_dic_value" domainObjectName="DictionaryValue"
+        <table tableName="tbl_clue_remark" domainObjectName="ClueRemark"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">
