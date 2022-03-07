@@ -12,7 +12,9 @@ import com.yp.crm.common.utils.UUIDUtils;
 import com.yp.crm.settings.domain.User;
 import com.yp.crm.settings.service.UserService;
 import com.yp.crm.workbench.domain.Clue;
+import com.yp.crm.workbench.domain.ClueRemark;
 import com.yp.crm.workbench.domain.DictionaryValue;
+import com.yp.crm.workbench.service.ClueRemarkService;
 import com.yp.crm.workbench.service.ClueService;
 import com.yp.crm.workbench.service.DictionaryValueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,9 @@ public class ClueController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ClueRemarkService clueRemarkService;
 
     @RequestMapping("/index.do")
     public ModelAndView index(){
@@ -166,8 +171,16 @@ public class ClueController {
     }
 
     @RequestMapping("/queryClueRemarkListById.do")
-    public String detail(){
-        
-        return "workbench/clue/detail";
+    public ModelAndView detail(String id){
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("workbench/clue/detail");
+
+        List<ClueRemark> clueRemarkList = clueRemarkService.queryClueRemarkListByClueId(id);
+        Clue clue=clueService.queryClueByIdForTail(id);
+        System.out.println(clue.getCreateBy()+"   "+clue.getEditBy());
+
+        mv.addObject("clueRemarkList", clueRemarkList);
+        mv.addObject("clue", clue);
+        return mv;
     }
 }

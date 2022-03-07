@@ -52,4 +52,7 @@ public interface ClueService {
      * @return
      */
     Clue queryClue(String id);
+
+    Clue queryClueByIdForTail(String id);
+
 }

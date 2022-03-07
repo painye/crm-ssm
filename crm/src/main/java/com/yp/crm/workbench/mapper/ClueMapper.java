@@ -67,6 +67,6 @@ public interface ClueMapper {
      */
     int queryClueCountsByCondition(Map<String, Object> map);
 
-
+    Clue selectClueByIdForTail(String id);
 
 }

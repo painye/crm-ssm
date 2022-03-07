@@ -32,8 +32,9 @@ public class ClueServiceImpl implements ClueService {
 
     @Override
     public List<Clue> queryClueByConditionForPage(Map<String, Object> map) {
-
-        return  clueMapper.queryClueByConditionForPage(map);
+        List<Clue> clueList = clueMapper.queryClueByConditionForPage(map);
+        System.out.println(clueList);
+        return  clueList;
     }
 
     @Override
@@ -53,6 +54,15 @@ public class ClueServiceImpl implements ClueService {
 
     @Override
     public Clue queryClue(String id) {
-        return clueMapper.selectClueById(id);
+        Clue clue =clueMapper.selectClueById(id);
+        System.out.println(clue.getCreateBy()+"------"+clue.getEditBy());
+        return clue;
+    }
+
+    @Override
+    public Clue queryClueByIdForTail(String id) {
+        Clue clue= clueMapper.selectClueByIdForTail(id);
+        System.out.println(clue);
+        return clue;
     }
 }
