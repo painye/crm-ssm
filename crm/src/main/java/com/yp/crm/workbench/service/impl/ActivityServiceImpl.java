@@ -5,12 +5,8 @@ package com.yp.crm.workbench.service.impl;
  */
 
 import com.yp.crm.workbench.domain.Activity;
-import com.yp.crm.workbench.domain.ActivityRemark;
-import com.yp.crm.workbench.domain.ClueAndActivityRelation;
 import com.yp.crm.workbench.mapper.ActivityMapper;
-import com.yp.crm.workbench.mapper.ActivityRemarkMapper;
 import com.yp.crm.workbench.service.ActivityService;
-import org.aspectj.apache.bcel.generic.RET;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -88,6 +84,11 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<Activity> queryActivityByActivityNameAndClueId(Map<String, Object> map) {
         return activityMapper.selectActivityByActivityNameAndClueId(map);
+    }
+
+    @Override
+    public List<Activity> queryActivityListByIds(String[] ids) {
+        return activityMapper.selectActivityListByIds(ids);
     }
 
 }

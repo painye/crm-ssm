@@ -330,5 +330,16 @@
     )
     order by a.createTime
   </select>
+
+  <select id="selectActivityListByIds" resultMap="BaseResultMap">
+    select a.id, a.name, a.startdate, a.enddate, u.name as owner
+    from tbl_activity a
+    join tbl_user u on u.id = a.owner
+    where a.id in
+    <foreach collection="array" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+    order by a.createtime desc
+  </select>
 </mapper>
 

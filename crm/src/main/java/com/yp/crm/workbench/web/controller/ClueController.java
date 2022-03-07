@@ -220,12 +220,15 @@ public class ClueController {
         int nums = clueService.addActivityClueRelations(relationList);
         ReturnObject returnObject = new ReturnObject();
 
-        if(nums > 1){
+        if(nums >= 1){
             returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+            List<Activity> activityList = activityService.queryActivityListByIds(activityId);
+            returnObject.setRetObject(activityList);
         }else{
             returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
             returnObject.setMessage(Constants.RETURN_OBJECT_MESSAGE);
         }
         return returnObject;
+
     }
 }

@@ -176,7 +176,8 @@ request.getServerPort() + request.getContextPath() + "/";
 			$.ajax({
 				url:"workbench/clue/queryActivityByName.do",
 				data:{
-					activityName:activityName
+					activityName:activityName,
+					clueId:clueId
 				},
 				dataType:"json",
 				type:"post",
@@ -216,6 +217,10 @@ request.getServerPort() + request.getContextPath() + "/";
 
 		//为“关联市场活动”按钮绑定事件
 		$("#clueAndActivityBtn").click(function () {
+			//清空模态窗口
+			$("#activityName").val("");
+			$("#activityListTbody").html("");
+
 			$("#bundModal").modal("show");
 		})
 
@@ -241,6 +246,17 @@ request.getServerPort() + request.getContextPath() + "/";
 				success:function (data) {
 					if(data.code == "1"){
 						$("#bundModal").modal("hide");
+						var html="";
+						$.each(data.retObject, function (index, object) {
+							html+='	<tr>';
+							html+='		<td>'+object.name+'</td>';
+							html+='		<td>'+object.startdate+'</td>';
+							html+='	<td>'+object.enddate+'</td>';
+							html+='	<td>'+object.owner+'</td>';
+							html+='		<td><a activityId="'+object.id+'" href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>';
+							html+='	</tr>';
+						})
+						$("#relatedActivityTbody").append(html);
 					}else{
 						alert(data.message);
 					}
@@ -516,7 +532,7 @@ request.getServerPort() + request.getContextPath() + "/";
 							<td></td>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody id="relatedActivityTbody">
 <%--						<tr>--%>
 <%--							<td>发传单</td>--%>
 <%--							<td>2020-10-10</td>--%>

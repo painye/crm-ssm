@@ -66,11 +66,38 @@ public interface ActivityMapper {
 
     List<Activity> selectCheckedActivityById(String[] ids);
 
+    /**
+     * 将活动实体的集合全部插入到数据库中
+     * @param activityList
+     * @return
+     */
     int insertActivityByList(List<Activity> activityList);
 
+    /**
+     * 根据市场活动id查询活动的详细信息
+     * @param id
+     * @return
+     */
     Activity selectActivityForDetailById(String id);
 
+    /**
+     * 根据线索id查出与其关联的所有市场活动
+     * @param cluId
+     * @return
+     */
     List<Activity> selectActivityByClueId(String cluId);
 
+    /**
+     * 实现根据名称模糊查询市场火哦的那个，并排除已于当前线索关联过的火哦的那个
+     * @param map
+     * @return
+     */
     List<Activity> selectActivityByActivityNameAndClueId(Map<String, Object> map);
+
+    /**
+     * 查询所有id所属的市场活动
+     * @param ids
+     * @return
+     */
+    List<Activity> selectActivityListByIds(String[] ids);
 }
