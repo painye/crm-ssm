@@ -1,6 +1,7 @@
 package com.yp.crm.workbench.service;
 
 import com.yp.crm.workbench.domain.Clue;
+import com.yp.crm.workbench.domain.ClueAndActivityRelation;
 
 import java.util.List;
 import java.util.Map;
@@ -54,5 +55,7 @@ public interface ClueService {
     Clue queryClue(String id);
 
     Clue queryClueByIdForTail(String id);
+
+    int addActivityClueRelations(List<ClueAndActivityRelation> relationList);
 
 }

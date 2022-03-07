@@ -5,6 +5,7 @@ package com.yp.crm.workbench.service.impl;
  */
 
 import com.yp.crm.workbench.domain.Clue;
+import com.yp.crm.workbench.domain.ClueAndActivityRelation;
 import com.yp.crm.workbench.mapper.ClueMapper;
 import com.yp.crm.workbench.service.ClueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,5 +65,10 @@ public class ClueServiceImpl implements ClueService {
         Clue clue= clueMapper.selectClueByIdForTail(id);
         System.out.println(clue);
         return clue;
+    }
+
+    @Override
+    public int addActivityClueRelations(List<ClueAndActivityRelation> relationList) {
+        return clueMapper.insertActivityClueRelations(relationList);
     }
 }

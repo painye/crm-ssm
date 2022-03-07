@@ -310,5 +310,25 @@
     left join tbl_user u3 on a.editby = u3.id
     where a.id = #{id}
   </select>
+
+  <select id="selectActivityByClueId" resultMap="BaseResultMap">
+    select a.id, a.name, u.name as owner, a.startdate, a.enddate
+    from tbl_activity a
+    join tbl_user u on u.id = a.owner
+    join tbl_clue_activity_relation car on a.id = car.activity_id
+    where car.clue_id = #{clueId}
+  </select>
+
+  <select id="selectActivityByActivityNameAndClueId" resultMap="BaseResultMap">
+    select a.name, u.name as owner, a.startdate, a.enddate, a.id
+    from tbl_activity a
+    join tbl_user u on u.id = a.owner
+    where a.name like '%' #{activityName} '%' and a.id not in (
+        select activity_id
+        from tbl_clue_activity_relation
+        where clue_id = #{clueId}
+    )
+    order by a.createTime
+  </select>
 </mapper>
 

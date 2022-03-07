@@ -381,7 +381,12 @@
     where c.id = #{id}
   </select>
 
-
-
+  <insert id="insertActivityClueRelations">
+    insert into tbl_clue_activity_relation
+    (id, activity_id, clue_id) values
+    <foreach collection="list" item="relation" separator=",">
+      (#{relation.id}, #{relation.activityId}, #{relation.clueId})
+    </foreach>
+  </insert>
 
 </mapper>

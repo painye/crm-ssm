@@ -6,6 +6,7 @@ package com.yp.crm.workbench.service.impl;
 
 import com.yp.crm.workbench.domain.Activity;
 import com.yp.crm.workbench.domain.ActivityRemark;
+import com.yp.crm.workbench.domain.ClueAndActivityRelation;
 import com.yp.crm.workbench.mapper.ActivityMapper;
 import com.yp.crm.workbench.mapper.ActivityRemarkMapper;
 import com.yp.crm.workbench.service.ActivityService;
@@ -78,4 +79,15 @@ public class ActivityServiceImpl implements ActivityService {
     public Activity queryActivityForDetailById(String id) {
         return activityMapper.selectActivityForDetailById(id);
     }
+
+    @Override
+    public List<Activity> queryActivityByClueId(String clueId) {
+        return activityMapper.selectActivityByClueId(clueId);
+    }
+
+    @Override
+    public List<Activity> queryActivityByActivityNameAndClueId(Map<String, Object> map) {
+        return activityMapper.selectActivityByActivityNameAndClueId(map);
+    }
+
 }

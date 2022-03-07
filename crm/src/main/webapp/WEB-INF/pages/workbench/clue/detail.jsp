@@ -168,6 +168,88 @@ request.getServerPort() + request.getContextPath() + "/";
 				}
 			})
 		})
+
+		//为模糊查询市场活动绑定事件
+		$("#searchActivityBtn").click(function () {
+			var activityName = $("#activityName").val();
+			var clueId = '${clue.id}';
+			$.ajax({
+				url:"workbench/clue/queryActivityByName.do",
+				data:{
+					activityName:activityName
+				},
+				dataType:"json",
+				type:"post",
+				success: function (data) {
+					html = "";
+					if(data.code=="1"){
+						$.each(data.retObject, function (index, object) {
+							html+='	<tr>';
+							html+='	<td><input value="'+object.id+'" type="checkbox"/></td>';
+							html+='			<td>'+object.name+'</td>';
+							html+='			<td>'+object.startdate+'</td>';
+							html+='			<td>'+object.enddate+'</td> ';
+							html+='	<td>'+object.owner+'</td>';
+							html+='	</tr>';
+						})
+						$("#activityListTbody").html(html);
+					}else{
+						alert(data.message);
+					}
+				}
+			})
+		})
+
+		//为全选按钮绑定事件
+		$("#checkAll").click(function () {
+			$("#activityListTbody input[type='checkbox']").prop("checked", this.checked);
+		})
+
+		//全选触发全选按钮
+		$("#activityListTbody").on("click", "input[type='checkbox']", function () {
+			if($("#activityListTbody input[type='checkbox']").size() == $("#activityListTbody input[type='checkbox']:checked").size()){
+				$("#checkAll").prop("checked", true);
+			}else{
+				$("#checkAll").prop("checked", false);
+			}
+		})
+
+		//为“关联市场活动”按钮绑定事件
+		$("#clueAndActivityBtn").click(function () {
+			$("#bundModal").modal("show");
+		})
+
+		//为关联按钮绑定事件
+		$("#bundBtn").click(function () {
+			//封装参数
+			var checkedActivity=$("#activityListTbody input[type='checkbox']:checked");
+			if(checkedActivity.size()==0){
+				alert("请至少选择一条市场活动进行关联");
+				return;
+			}
+			var id="?clueId="+'${clue.id}';
+			$.each(checkedActivity, function (index, object) {
+				id+="&activityId="+object.value;
+			})
+
+			//发送请求
+			$.ajax({
+				url:"workbench/clue/addActivityClueRelations.do"+id,
+				data:{},
+				dataType:"json",
+				type:"post",
+				success:function (data) {
+					if(data.code == "1"){
+						$("#bundModal").modal("hide");
+					}else{
+						alert(data.message);
+					}
+
+				}
+			})
+
+		})
+
 	});
 	
 </script>
@@ -219,15 +301,16 @@ request.getServerPort() + request.getContextPath() + "/";
 					<div class="btn-group" style="position: relative; top: 18%; left: 8px;">
 						<form class="form-inline" role="form">
 						  <div class="form-group has-feedback">
-						    <input type="text" class="form-control" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
+						    <input type="text" class="form-control" id="activityName" style="width: 300px;" placeholder="请输入市场活动名称，支持模糊查询">
 						    <span class="glyphicon glyphicon-search form-control-feedback"></span>
 						  </div>
+							<button type="button" id="searchActivityBtn">搜索</button>
 						</form>
 					</div>
 					<table id="activityTable" class="table table-hover" style="width: 900px; position: relative;top: 10px;">
 						<thead>
 							<tr style="color: #B3B3B3;">
-								<td><input type="checkbox"/></td>
+								<td><input type="checkbox" id="checkAll"/></td>
 								<td>名称</td>
 								<td>开始日期</td>
 								<td>结束日期</td>
@@ -235,27 +318,27 @@ request.getServerPort() + request.getContextPath() + "/";
 								<td></td>
 							</tr>
 						</thead>
-						<tbody>
-							<tr>
-								<td><input type="checkbox"/></td>
-								<td>发传单</td>
-								<td>2020-10-10</td>
-								<td>2020-10-20</td>
-								<td>zhangsan</td>
-							</tr>
-							<tr>
-								<td><input type="checkbox"/></td>
-								<td>发传单</td>
-								<td>2020-10-10</td>
-								<td>2020-10-20</td>
-								<td>zhangsan</td>
-							</tr>
+						<tbody id = "activityListTbody">
+<%--							<tr>--%>
+<%--								<td><input type="checkbox"/></td>--%>
+<%--								<td>发传单</td>--%>
+<%--								<td>2020-10-10</td>--%>
+<%--								<td>2020-10-20</td>--%>
+<%--								<td>zhangsan</td>--%>
+<%--							</tr>--%>
+<%--							<tr>--%>
+<%--								<td><input type="checkbox"/></td>--%>
+<%--								<td>发传单</td>--%>
+<%--								<td>2020-10-10</td>--%>
+<%--								<td>2020-10-20</td>--%>
+<%--								<td>zhangsan</td>--%>
+<%--							</tr>--%>
 						</tbody>
 					</table>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">关联</button>
+					<button type="button" class="btn btn-primary" id="bundBtn">关联</button>
 				</div>
 			</div>
 		</div>
@@ -373,7 +456,7 @@ request.getServerPort() + request.getContextPath() + "/";
 		<div class="page-header">
 			<h4>备注</h4>
 		</div>
-		
+
 <%--		<!-- 备注1 -->--%>
 <%--		<div class="remarkDiv" style="height: 60px;">--%>
 <%--			<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">--%>
@@ -388,20 +471,6 @@ request.getServerPort() + request.getContextPath() + "/";
 <%--			</div>--%>
 <%--		</div>--%>
 <%--		--%>
-		<!-- 备注2 -->
-<%--		<div class="remarkDiv" style="height: 60px;">--%>
-<%--			<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">--%>
-<%--			<div style="position: relative; top: -40px; left: 40px;" >--%>
-<%--				<h5>呵呵！</h5>--%>
-<%--				<font color="gray">线索</font> <font color="gray">-</font> <b>李四先生-动力节点</b> <small style="color: gray;"> 2017-01-22 10:20:10 由zhangsan</small>--%>
-<%--				<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">--%>
-<%--					<a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>--%>
-<%--					&nbsp;&nbsp;&nbsp;&nbsp;--%>
-<%--					<a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>--%>
-<%--				</div>--%>
-<%--			</div>--%>
-<%--		</div>--%>
-
 			<c:forEach items="${clueRemarkList}" var="remark">
 				<div id="div_${remark.id}" class="remarkDiv" style="height: 60px;">
 						<img title="${remark.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
@@ -448,26 +517,35 @@ request.getServerPort() + request.getContextPath() + "/";
 						</tr>
 					</thead>
 					<tbody>
+<%--						<tr>--%>
+<%--							<td>发传单</td>--%>
+<%--							<td>2020-10-10</td>--%>
+<%--							<td>2020-10-20</td>--%>
+<%--							<td>zhangsan</td>--%>
+<%--							<td><a href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>--%>
+<%--						</tr>--%>
+<%--						<tr>--%>
+<%--							<td>发传单</td>--%>
+<%--							<td>2020-10-10</td>--%>
+<%--							<td>2020-10-20</td>--%>
+<%--							<td>zhangsan</td>--%>
+<%--							<td><a href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>--%>
+<%--						</tr>--%>
+					<c:forEach items="${activityList}" var="activity">
 						<tr>
-							<td>发传单</td>
-							<td>2020-10-10</td>
-							<td>2020-10-20</td>
-							<td>zhangsan</td>
-							<td><a href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
+							<td>${activity.name}</td>
+							<td>${activity.startdate}</td>
+							<td>${activity.enddate}</td>
+							<td>${activity.owner}</td>
+							<td><a activityId="${activity.id}" href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
 						</tr>
-						<tr>
-							<td>发传单</td>
-							<td>2020-10-10</td>
-							<td>2020-10-20</td>
-							<td>zhangsan</td>
-							<td><a href="javascript:void(0);"  style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
-						</tr>
+					</c:forEach>
 					</tbody>
 				</table>
 			</div>
 			
 			<div>
-				<a href="javascript:void(0);" data-toggle="modal" data-target="#bundModal" style="text-decoration: none;"><span class="glyphicon glyphicon-plus"></span>关联市场活动</a>
+				<a href="javascript:void(0);" id="clueAndActivityBtn" style="text-decoration: none;"><span class="glyphicon glyphicon-plus"></span>关联市场活动</a>
 			</div>
 		</div>
 	</div>

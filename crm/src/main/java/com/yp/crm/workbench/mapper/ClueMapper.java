@@ -1,6 +1,7 @@
 package com.yp.crm.workbench.mapper;
 
 import com.yp.crm.workbench.domain.Clue;
+import com.yp.crm.workbench.domain.ClueAndActivityRelation;
 
 import java.util.List;
 import java.util.Map;
@@ -68,5 +69,8 @@ public interface ClueMapper {
     int queryClueCountsByCondition(Map<String, Object> map);
 
     Clue selectClueByIdForTail(String id);
+
+    int insertActivityClueRelations(List<ClueAndActivityRelation> relationList);
+
 
 }

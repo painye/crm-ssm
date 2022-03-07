@@ -11,9 +11,8 @@ import com.yp.crm.common.utils.DateUtils;
 import com.yp.crm.common.utils.UUIDUtils;
 import com.yp.crm.settings.domain.User;
 import com.yp.crm.settings.service.UserService;
-import com.yp.crm.workbench.domain.Clue;
-import com.yp.crm.workbench.domain.ClueRemark;
-import com.yp.crm.workbench.domain.DictionaryValue;
+import com.yp.crm.workbench.domain.*;
+import com.yp.crm.workbench.service.ActivityService;
 import com.yp.crm.workbench.service.ClueRemarkService;
 import com.yp.crm.workbench.service.ClueService;
 import com.yp.crm.workbench.service.DictionaryValueService;
@@ -24,10 +23,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @ClassName : com.yp.crm.workbench.web.controller.ClueController
@@ -49,6 +46,9 @@ public class ClueController {
 
     @Autowired
     private ClueRemarkService clueRemarkService;
+
+    @Autowired
+    private ActivityService activityService;
 
     @RequestMapping("/index.do")
     public ModelAndView index(){
@@ -177,9 +177,55 @@ public class ClueController {
 
         List<ClueRemark> clueRemarkList = clueRemarkService.queryClueRemarkListByClueId(id);
         Clue clue=clueService.queryClueByIdForTail(id);
+        List<Activity> activityList = activityService.queryActivityByClueId(id);
 
         mv.addObject("clueRemarkList", clueRemarkList);
         mv.addObject("clue", clue);
+        mv.addObject("activityList",activityList );
         return mv;
+    }
+
+    @RequestMapping("queryActivityByName.do")
+    @ResponseBody
+    public Object queryActivityByName(String activityName, String clueId){
+        Map<String,Object> map= new HashMap<>();
+        map.put("activityName", activityName);
+        map.put("clueId", clueId);
+        ReturnObject returnObject = new ReturnObject();
+        List<Activity> activityList = activityService.queryActivityByActivityNameAndClueId(map);
+        if(activityList != null){
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+            returnObject.setRetObject(activityList);
+        }else{
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+            returnObject.setMessage(Constants.RETURN_OBJECT_MESSAGE);
+        }
+        return returnObject;
+    }
+
+    @RequestMapping("/addActivityClueRelations.do")
+    @ResponseBody
+    public Object addActivityClueRelations(String[] activityId, String clueId){
+        //1、封装参数
+        List<ClueAndActivityRelation> relationList = new ArrayList<>();
+        for(String aId:activityId){
+            ClueAndActivityRelation relation = new ClueAndActivityRelation();
+            relation.setActivityId(aId);
+            relation.setClueId(clueId);
+            relation.setId(UUIDUtils.getUUid());
+            relationList.add(relation);
+        }
+
+        //2、调用service
+        int nums = clueService.addActivityClueRelations(relationList);
+        ReturnObject returnObject = new ReturnObject();
+
+        if(nums > 1){
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+        }else{
+            returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIl);
+            returnObject.setMessage(Constants.RETURN_OBJECT_MESSAGE);
+        }
+        return returnObject;
     }
 }
