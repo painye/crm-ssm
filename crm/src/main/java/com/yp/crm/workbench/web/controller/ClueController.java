@@ -177,7 +177,6 @@ public class ClueController {
 
         List<ClueRemark> clueRemarkList = clueRemarkService.queryClueRemarkListByClueId(id);
         Clue clue=clueService.queryClueByIdForTail(id);
-        System.out.println(clue.getCreateBy()+"   "+clue.getEditBy());
 
         mv.addObject("clueRemarkList", clueRemarkList);
         mv.addObject("clue", clue);

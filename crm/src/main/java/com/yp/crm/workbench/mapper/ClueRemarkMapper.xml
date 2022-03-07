@@ -168,7 +168,7 @@
 
 
   <select id="selectClueRemarkListByClueId" resultMap="BaseResultMap">
-    select cr.note_content, u1.name as create_by,cr.create_time,
+    select cr.id, cr.note_content, u1.name as create_by,cr.create_time,cr.edit_time,
         u2.name as edit_by, cr.edit_flag, cr.clue_id
     from tbl_clue_remark cr
     join tbl_user u1 on u1.id=cr.create_by
@@ -176,4 +176,15 @@
     where clue_id = #{clueId}
     order by cr.create_time
   </select>
+
+  <update id="updateClueRemark">
+    update tbl_clue_remark
+    set edit_flag=#{editFlag},edit_by=#{editBy},edit_time=#{editTime},note_content=#{noteContent}
+    where id=#{id}
+  </update>
+
+  <delete id="deleteClueRemark">
+    delete from tbl_clue_remark
+    where id=#{id}
+  </delete>
 </mapper>

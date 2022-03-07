@@ -12,4 +12,8 @@ public interface ClueRemarkService {
     List<ClueRemark> queryClueRemarkListByClueId(String clueId);
 
     int addClueRemark(ClueRemark clueRemark);
+
+    int deleteClueRemark(String id);
+
+    int editClueRemark(ClueRemark clueRemark);
 }

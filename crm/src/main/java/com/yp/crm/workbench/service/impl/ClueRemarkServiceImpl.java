@@ -34,4 +34,14 @@ public class ClueRemarkServiceImpl implements ClueRemarkService {
     public int addClueRemark(ClueRemark clueRemark) {
         return clueRemarkMapper.insertClueRemark(clueRemark);
     }
+
+    @Override
+    public int deleteClueRemark(String id) {
+        return clueRemarkMapper.deleteClueRemark(id);
+    }
+
+    @Override
+    public int editClueRemark(ClueRemark clueRemark) {
+        return clueRemarkMapper.updateClueRemark(clueRemark);
+    }
 }

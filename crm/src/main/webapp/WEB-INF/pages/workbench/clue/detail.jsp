@@ -70,6 +70,7 @@ request.getServerPort() + request.getContextPath() + "/";
 		})
 
 
+		//为保存线索备注绑定事件
 		$("#saveCreateClueRemarkBtn").click(function () {
 			var noteContent= $.trim($("#remark").val());
 			var clueId = '${clue.id}';
@@ -86,22 +87,80 @@ request.getServerPort() + request.getContextPath() + "/";
 					var html="";
 					if(data.code=="1"){
 						$("#remark").val("");
-						html+='<div class="remarkDiv" style="height: 60px;">';
+						html+='<div id="div_'+data.retObject.id+'" class="remarkDiv" style="height: 60px;">';
 						html+='	<img title="${sessionScope.sessionUser.name}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
 						html+='				<div style="position: relative; top: -40px; left: 40px;" >';
 						html+='				<h5 id="h5_'+data.retObject.id+'">'+data.retObject.noteContent+'</h5>';
 						html+='				<font color="gray">线索</font> <font color="gray">-</font> <b>${clue.fullname}${clue.appellation}-${clue.company}</b>' ;
-						html+='	<small style="color: gray;"> '+data.retObject.createTime+' 由${sessionScope.sessionUser.name}';
+						html+='	<small id="s_'+data.retObject.id+'" style="color: gray;"> '+data.retObject.createTime+' 由${sessionScope.sessionUser.name}';
 						html+='			创建</small>';
 						html+='			<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">';
-						html+='			<a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>';
+						html+='<a class="myHref" name="editClueRemarkBtn" remarkId="'+data.retObject.id+'" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>';
 						html+='	&nbsp;&nbsp;&nbsp;&nbsp;';
-						html+='<a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>';
+						html+='<a class="myHref" name="deleteClueRemarkBtn" remarkId="'+data.retObject.id+'" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>';
 						html+='	</div>';
 						html+='	</div>	';
 						html+='	</div>';
 
 						$("#remarkDiv").before(html);
+					}else{
+						alert(data.message);
+					}
+
+				}
+			})
+		})
+
+		//为删除线索备注绑定事件
+		$("#remarkListDiv").on("click", "a[name='deleteClueRemarkBtn']", function () {
+			var id=$(this).attr("remarkId");
+
+			$.ajax({
+				url:"workbench/clue/deleteClueRemark.do",
+				data:{
+					id:id
+				},
+				dataType:"json",
+				type:"post",
+				success:function (data) {
+					 if(data.code == "1"){
+					 	$("#div_"+id).remove();
+					 }else{
+					 	alert(data.message);
+					 }
+				}
+			})
+		})
+
+		//为修改线索备注绑定事件
+		$("#remarkListDiv").on("click", "a[name='editClueRemarkBtn']", function () {
+			var id=$(this).attr("remarkId");
+			var noteContent =$("#h5_"+id).html();
+
+			//打开修改线索的模态窗口
+			$("#editRemarkModal").modal("show");
+			$("#remarkId").val(id);
+			$("#noteContent").html(noteContent);
+		})
+
+		//为保存修改线索备注绑定事件
+		$("#updateRemarkBtn").click(function () {
+			var id=$("#remarkId").val();
+			var noteContent = $("#noteContent").val();
+
+			$.ajax({
+				url:"workbench/clue/editClueRemark.do",
+				data:{
+					id:id,
+					noteContent:noteContent
+				},
+				dataType:"json",
+				type:"post",
+				success:function (data) {
+					if(data.code == "1"){
+						$("#h5_"+id).html(noteContent);
+						$("#s_"+id).html(data.retObject.editTime+" 由"+"${sessionScope.sessionUser.name} 修改");
+						$("#editRemarkModal").modal("hide");
 					}else{
 						alert(data.message);
 					}
@@ -115,6 +174,36 @@ request.getServerPort() + request.getContextPath() + "/";
 
 </head>
 <body>
+
+<!-- 修改市场活动备注的模态窗口 -->
+<div class="modal fade" id="editRemarkModal" role="dialog">
+	<%-- 备注的id --%>
+	<input type="hidden" id="remarkId">
+	<div class="modal-dialog" role="document" style="width: 40%;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">修改备注</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" role="form">
+					<div class="form-group">
+						<label for="noteContent" class="col-sm-2 control-label">内容</label>
+						<div class="col-sm-10" style="width: 81%;">
+							<textarea class="form-control" rows="3" id="noteContent"></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" id="updateRemarkBtn">更新</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 	<!-- 关联市场活动的模态窗口 -->
 	<div class="modal fade" id="bundModal" role="dialog">
@@ -314,17 +403,17 @@ request.getServerPort() + request.getContextPath() + "/";
 <%--		</div>--%>
 
 			<c:forEach items="${clueRemarkList}" var="remark">
-				<div class="remarkDiv" style="height: 60px;">
+				<div id="div_${remark.id}" class="remarkDiv" style="height: 60px;">
 						<img title="${remark.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
 						<div style="position: relative; top: -40px; left: 40px;" >
 							<h5 id="h5_${remark.id}">${remark.noteContent}</h5>
 							<font color="gray">线索</font> <font color="gray">-</font> <b>${clue.fullname}${clue.appellation}-${clue.company}</b>
-							<small style="color: gray;"> ${remark.editFlag=='1'?remark.editTime:remark.createTime} 由${remark.editFlag=='1'?remark.editBy:remark.createBy}
+							<small id="s_${remark.id}" style="color: gray;"> ${remark.editFlag=='1'?remark.editTime:remark.createTime} 由${remark.editFlag=='1'?remark.editBy:remark.createBy}
 							${remark.editFlag=='1'?'修改':'创建'}</small>
 							<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
-								<a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
+								<a class="myHref" name="editClueRemarkBtn" remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
 								&nbsp;&nbsp;&nbsp;&nbsp;
-								<a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>
+								<a class="myHref" name="deleteClueRemarkBtn" remarkId="${remark.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>
 							</div>
 						</div>
 				</div>
